@@ -11,6 +11,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HomeComponent } from './components/home/home.component';
 import { EditorComponent } from './components/editor/editor.component';
+import { Page404Component } from './components/page404/page404.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { EditorComponent } from './components/editor/editor.component';
     NavbarComponent,
     SidebarComponent,
     HomeComponent,
-    EditorComponent
+    EditorComponent,
+    Page404Component
   ],
   imports: [
     BrowserModule,
