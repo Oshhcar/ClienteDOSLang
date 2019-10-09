@@ -3,6 +3,9 @@ import { NgModule } from '@angular/core';
 
 import { Title } from '@angular/platform-browser';
 
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -25,7 +28,9 @@ import { Page404Component } from './components/page404/page404.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    AngularFontAwesomeModule
+    AngularFontAwesomeModule,
+    HttpClientModule,
+    FormsModule
   ],
   providers: [
     Title

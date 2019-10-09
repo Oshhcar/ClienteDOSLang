@@ -1,1 +1,83 @@
-<p>home works!</p>
+<app-navbar></app-navbar>
+
+<div id="wrapper" class="toggled">
+    <!--
+        <app-sidebar></app-sidebar>
+    -->
+
+    <div id="content-wrapper">
+        <div class="container-fluid">
+
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a id="link" href="#" routerLink="/inicio">Inicio</a>
+                </li>
+                <li class="breadcrumb-item active">Editor</li>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <div class="input-group-append">
+                            <button type="button" class="input-group-text" (click)="addFile()">Nuevo</button>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="inputGroupFile02"
+                                (change)="onSelectFile($event.target.files)">
+                            <label class="custom-file-label" for="inputGroupFile02"
+                                aria-describedby="inputGroupFileAddon02">Cargar
+                                Archivo</label>
+                        </div>
+                        <div class="input-group-append">
+                            <button type="button" class="input-group-text" (click)="openFile()">Abrir</button>
+                        </div>
+                    </div>
+                </div>
+
+            </ol>
+
+            <div class="card mb-3">
+                <div class="card-header archivo">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <ng-template ngFor let-file [ngForOf]="files">
+                            <li class="nav-item">
+                                <a class="nav-link" id="{{files.indexOf(file)}}-tab" data-toggle="tab"
+                                    href="#tab_{{files.indexOf(file)}}" role="tab"
+                                    attr.aria-controls="{{files.indexOf(file)}}-tab"
+                                    aria-selected="false">{{file.name}}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="link" (click)="deleteFile(files.indexOf(file))">
+                                    <fa name="close" size="sm"></fa>
+                                </a>
+                            </li>
+                        </ng-template>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="addFile()">
+                                <fa name="plus-square" size="lg"></fa>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="myTabContent">
+                        <div *ngFor="let file of files" class="tab-pane fade" id="tab_{{files.indexOf(file)}}"
+                            role="tabpanel" attr.aria-labelledby="{{files.indexOf(file)}}_tab">
+                            <app-editor [file]="file"></app-editor>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Sticky Footer -->
+    <footer class="sticky-footer">
+        <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+                <span>Copyright © DOSLang 2019</span>
+            </div>
+        </div>
+    </footer>
+</div>

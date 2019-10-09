@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-page404',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Page404Component implements OnInit {
 
-  constructor() { }
+  constructor(
+    private titleService: Title,
+    private router: Router) {
+    document.body.className = "bg-dark";
+  }
 
   ngOnInit() {
+    this.titleService.setTitle("404 Error - DOSLang");
   }
 
 }
