@@ -48,8 +48,7 @@
         <div class="tab-content" id="myTabContent2">
             <div class="tab-pane fade show active" id="{{file.name}}consola" role="tabpanel"
                 attr.aria-labelledby="{{file.name}}consola-tab">
-                <textarea class="form-control" id="{{file.name}}consola" rows="5" [(ngModel)]='consolaEditor'
-                    disabled>Consola</textarea>
+                <div class="code-editor" #consolaEditor></div>
             </div>
 
             <div class="tab-pane fade" id="{{file.name}}errores" role="tabpanel"
