@@ -20,11 +20,11 @@ export class Print extends Instruccion{
 
         if(!isNullOrUndefined(valExpr)){
             if (this.char == "c") {
-                log.setValue(log.getValue() + String.fromCharCode(valExpr) + "\n");
+                log.setValue(log.getValue() + String.fromCharCode(valExpr));
             } else if(this.char == "e"){
-                log.setValue(log.getValue() + Math.round(valExpr) + "\n");
+                log.setValue(log.getValue() + Math.round(valExpr));
             } else {
-                log.setValue(log.getValue() + parseFloat(valExpr)/*.toFixed(5)*/ + "\n");
+                log.setValue(log.getValue() + parseFloat(valExpr)/*.toFixed(5)*/);
             }
             log.gotoPageDown();
         }

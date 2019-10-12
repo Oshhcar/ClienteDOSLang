@@ -68,6 +68,9 @@ identifier          ({letter}|"_")({letter}|{digit}|"_")*
     const Identificador = require('./ast/expresion/identificador').Identificador;
     const Salto = require('./ast/instruccion/salto').Salto;
     const SaltoCond = require('./ast/instruccion/saltoCond').SaltoCond;
+    const Metodo = require('./ast/instruccion/metodo').Metodo;
+    const Temporal = require('./ast/expresion/temporal').Temporal;
+    const Call = require('./ast/instruccion/call').Call;
 %}
 
 %start START
@@ -103,9 +106,9 @@ INSTRUCTION
     | JUMP
         { $$ = $1; }
     | begin comma comma comma identifier BLOCKS end comma comma comma identifier 
-        { }
+        { $$ = new Metodo($5, $11, $6, (yylineno + 1), (@1.first_column + 1)); }
     | call comma comma comma identifier
-        { }
+        { $$ = new Call($5, (yylineno + 1), (@1.first_column + 1)); }
     | print '('  '%' CHART comma LITERAL ')' 
         { $$ = new Print($4, $6, (yylineno + 1), (@1.first_column + 1)); }
     | call comma comma comma in_vaule
@@ -117,11 +120,13 @@ ASSIGNMENT
         { 
             $$ = $1;
             $$.target = $3;
+            $$.temp = true;
         }
     | E comma identifier
         { 
             $$ = $1;
             $$.target = $3;
+            $$.temp = false;
         }
     ;
 
@@ -146,7 +151,7 @@ LITERAL
     : number
         { $$ = new Literal(0, Number(yytext), (yylineno + 1), (@1.first_column + 1)); }
     | temp
-        { $$ = new Identificador($1, (yylineno + 1), (@1.first_column + 1)); }
+        { $$ = new Temporal($1, (yylineno + 1), (@1.first_column + 1)); }
     | identifier
         { $$ = new Identificador($1, (yylineno + 1), (@1.first_column + 1)); }
     ;
@@ -176,26 +181,28 @@ COND
 BLOCKS
     : BLOCK 
         {
-        
+            $$ = [];
+            $$.push($1);
         }
     | BLOCKS BLOCK
         {
-            
+            $$ = $1;
+            $$.push($2);   
         }
     ;
 
 BLOCK
     :  ASSIGNMENT
-        { }
+        { $$ = $1; }
     | label colon
-        { }
+        { $$ = new Label($1, (yylineno + 1), (@1.first_column + 1)); }
     | JUMP
-        { }
+        { $$ = $1; }
     | call comma comma comma identifier
-        { }
+        { $$ = new Call($5, (yylineno + 1), (@1.first_column + 1)); }
     | print '('  '%' CHART comma LITERAL ')' 
-        { }
-    | call comma comma comma in_vaule 
+        { $$ = new Print($4, $6, (yylineno + 1), (@1.first_column + 1)); }
+    | call comma comma comma in_vaule
         { }
     ;
 

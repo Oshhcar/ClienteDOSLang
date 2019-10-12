@@ -3,36 +3,16 @@ import { Simbolo, Tipo } from "./simbolo.interface";
 export class Entorno {
 
     Simbolos: Simbolo[];
-    Display: number[];
+    G: Entorno;
 
-    constructor(){
+    constructor(public Display: Entorno){
         this.Simbolos = [];
-        this.Display = [];
-        this.Display.push(0);
 
-        this.Simbolos.push({
-            id: "p",
-            valor: 0,
-            tipo: Tipo.NUMERO
-        });
-
-        this.Simbolos.push({
-            id: "h",
-            valor: 0,
-            tipo: Tipo.NUMERO
-        });
-
-        this.Simbolos.push({
-            id: "stack",
-            valor: [],
-            tipo: Tipo.ARREGLO
-        });
-
-        this.Simbolos.push({
-            id: "heap",
-            valor: [],
-            tipo: Tipo.ARREGLO
-        });
+        if(Display){
+            this.G = this.Display.G;
+        } else {
+            this.G = null;
+        }
     }
 
     addSimbolo(s: Simbolo){
@@ -44,6 +24,28 @@ export class Entorno {
             return item.id === id;
         }); 
         return elSimbolo;
+    }
+
+    getTemporal(id: String): Simbolo{
+        for(let i = 0; i < this.Simbolos.length; i++){
+            let s = this.Simbolos[i];
+            if(s.id === id){
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    getIdentificador(id: String): Simbolo{
+        for(let i = 0; i < this.G.Simbolos.length; i++){
+            let s = this.G.Simbolos[i];
+            if(s.id === id){
+                return s;
+            }
+        }
+
+        return null;
     }
 
     getLabel(id: String): Simbolo{
@@ -60,6 +62,20 @@ export class Entorno {
         return null;
     }
 
+    getMetodo(id: String): Simbolo{
+
+        for(let i = 0; i < this.G.Simbolos.length; i++){
+            let s = this.G.Simbolos[i];
+            if(s.tipo == Tipo.METODO){
+                if(s.id === id){
+                    return s;
+                }
+            }
+        }
+
+        return null;
+    }
+
     getTipo(id: String): Tipo{
         const elSimbolo = this.Simbolos.find((item) =>{
             return item.id === id;
@@ -67,4 +83,10 @@ export class Entorno {
         return elSimbolo.tipo;
     }
 
+    Recorrer(){
+        for(let i = 0; i < this.Simbolos.length; i++){
+            let s = this.Simbolos[i];
+            console.log(s.id+': '+s.tipo.toString()+" = "+s.valor);
+        }
+    }
 }

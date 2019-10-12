@@ -1,7 +1,7 @@
 import { Expresion } from './expresion';
 import { Entorno } from '../entorno/entorno';
 
-export class Identificador extends Expresion{
+export class Temporal extends Expresion{
 
     constructor(
         public id: String, 
@@ -12,7 +12,7 @@ export class Identificador extends Expresion{
     }
 
     getValor(e: Entorno, log: any, errores: any) {
-        let s = e.getIdentificador(this.id.toLowerCase()); 
+        let s = e.getTemporal(this.id.toLowerCase()); 
         if(s){
             this.Tipo = s.tipo;
             return s.valor;
@@ -20,7 +20,7 @@ export class Identificador extends Expresion{
             errores.push({
                 numero: errores.length+1,
                 valor: 'Semántico',
-                descripcion: 'Variable "' + this.id.toLowerCase() + '" no definida.',
+                descripcion: 'Temporal "' + this.id.toLowerCase() + '" no definido.',
                 linea: this.linea,
                 columna: this.columna
             });

@@ -7,6 +7,7 @@ import { Tipo } from '../entorno/simbolo.interface';
 export class Asignacion extends Instruccion {
 
     public target: String;
+    public temp: boolean;
 
     constructor(
         public op: Op,
@@ -25,7 +26,7 @@ export class Asignacion extends Instruccion {
             if (this.op == Op.IGUAL) {
                 if (isNullOrUndefined(this.exp2)) {
                     if (this.exp1.Tipo == Tipo.NUMERO) {
-                        let sim = e.getSimbolo(this.target.toLowerCase());
+                        let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                         if (isNullOrUndefined(sim)) {
                             sim = {
                                 id: this.target.toLowerCase(),
@@ -60,7 +61,7 @@ export class Asignacion extends Instruccion {
                     if (!isNullOrUndefined(valExp2)) {
                         if (this.target.toLowerCase() === "stack" || this.target.toLowerCase() === "heap") {
 
-                            let sim = e.getSimbolo(this.target.toLowerCase());
+                            let sim = e.getIdentificador(this.target.toLowerCase());
                             if (isNullOrUndefined(sim)) {
                                 sim = {
                                     id: this.target.toLowerCase(),
@@ -104,7 +105,7 @@ export class Asignacion extends Instruccion {
                                             columna: this.columna
                                         });
                                     } else {
-                                        let sim = e.getSimbolo(this.target.toLowerCase());
+                                        let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                                         if (isNullOrUndefined(sim)) {
                                             sim = {
                                                 id: this.target.toLowerCase(),
@@ -151,7 +152,7 @@ export class Asignacion extends Instruccion {
 
                 if (!isNullOrUndefined(valExp2)) {
                     if (this.exp1.Tipo == Tipo.NUMERO && this.exp2.Tipo == Tipo.NUMERO) {
-                        let sim = e.getSimbolo(this.target.toLowerCase());
+                        let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                         if (isNullOrUndefined(sim)) {
                             sim = {
                                 id: this.target.toLowerCase(),
