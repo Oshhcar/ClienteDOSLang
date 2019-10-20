@@ -7,6 +7,8 @@ import 'ace-builds/src-noconflict/mode-java';
 import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/theme-terminal'
 import 'ace-builds/src-noconflict/mode-text';
+import { SocketService } from 'src/app/services/socket/socket.service';
+import { ContenidoInterface } from 'src/app/models/contenido.interface';
 
 const THEME = 'ace/theme/github';
 const LANG = 'ace/mode/java';
@@ -19,8 +21,10 @@ const parserCuadruplos = require('../../parser/cuadruplos/parserCuadruplos');
   styleUrls: ['./editor.component.css']
 })
 export class EditorComponent implements OnInit {
-
+  
   @Input('file') file: FileInterface;
+
+  @Input('files') files: FileInterface[];
 
   @ViewChild('codeEditor', {static:true}) codeEditorElmRef: ElementRef;
   private codeEditor: ace.Ace.Editor;
@@ -31,7 +35,7 @@ export class EditorComponent implements OnInit {
   @ViewChild('consolaEditor', {static: true}) consolaEditorElmRef: ElementRef;
   private consolaEditor: ace.Ace.Editor;
 
-  constructor() { }
+  constructor(private socket: SocketService) { }
 
   ngOnInit() {
     const element = this.codeEditorElmRef.nativeElement;
@@ -47,7 +51,11 @@ export class EditorComponent implements OnInit {
     this.codeEditor.getSession().setMode(LANG);
     this.codeEditor.setShowFoldWidgets(true); // for the scope fold feature
     this.codeEditor.setValue(this.file.content);
-    this.codeEditor.gotoLine(1,0,false);
+    this.codeEditor.navigateLineEnd();
+
+    this.codeEditor.addEventListener("change", ()=>{
+      this.file.content = this.codeEditor.getValue();
+    });
 
     const element3d = this.codeEditorElmRef3d.nativeElement;
     const editorOptions3d: Partial<ace.Ace.EditorOptions> = {
@@ -87,6 +95,8 @@ export class EditorComponent implements OnInit {
 
   reportes: FileInterface[]=[];
 
+  contenido: ContenidoInterface;
+
   onGuardar(){
     //console.log(this.codeEditor.getValue());
     var blob = new Blob([this.codeEditor.getValue()], { type : 'text/plain'});
@@ -118,6 +128,22 @@ export class EditorComponent implements OnInit {
   onCompilar() {
     this.error= '';
     this.mensaje = '';
+    this.file.main = true;
+
+    this.socket.traducir(this.files)
+    .subscribe(
+      (contenido: ContenidoInterface) =>{
+        this.contenido = contenido;
+        this.codeEditor3d.setValue(this.contenido.content.toString());
+        this.codeEditor3d.navigateLineEnd();
+      },
+      (error) =>{
+        this.error = error;
+      }
+    );
+    //console.log("archivos->"+this.files);
+
+    this.file.main = false;
   }
 
   onEjecutar() {

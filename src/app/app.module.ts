@@ -16,6 +16,8 @@ import { HomeComponent } from './components/home/home.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { Page404Component } from './components/page404/page404.component';
 
+import { SocketService } from './services/socket/socket.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,7 +35,8 @@ import { Page404Component } from './components/page404/page404.component';
     FormsModule
   ],
   providers: [
-    Title
+    Title,
+    SocketService
   ],
   bootstrap: [AppComponent]
 })

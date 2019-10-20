@@ -20,15 +20,11 @@ export class HomeComponent implements OnInit {
 
   file1: FileInterface = {
     name: 'archivo1',
-    content: ''
+    content: '',
+    main: false
   }
 
-  file2: FileInterface = {
-    name: 'archivo2',
-    content: ''
-  }
-
-  contador: number = 3;
+  contador: number = 2;
 
   files: FileInterface[] = [];
 
@@ -42,13 +38,13 @@ export class HomeComponent implements OnInit {
 
     this.titleService.setTitle("Editor - DOSLang");
     this.files.push(this.file1);
-    this.files.push(this.file2);
   }
 
   addFile(){
     this.nuevo = {
       name: 'archivo'+this.contador++,
-      content: ''
+      content: '',
+      main: false
     }
     this.files.push(this.nuevo);
   }

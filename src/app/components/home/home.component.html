@@ -64,7 +64,7 @@
                     <div class="tab-content" id="myTabContent">
                         <div *ngFor="let file of files" class="tab-pane fade" id="tab_{{files.indexOf(file)}}"
                             role="tabpanel" attr.aria-labelledby="{{files.indexOf(file)}}_tab">
-                            <app-editor [file]="file"></app-editor>
+                            <app-editor [file]="file" [files]="files"></app-editor>
                         </div>
                     </div>
                 </div>
