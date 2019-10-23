@@ -18,7 +18,6 @@ export class Temporal extends Expresion{
             return s.valor;
         } else {
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Temporal "' + this.id.toLowerCase() + '" no definido.',
                 linea: this.linea,

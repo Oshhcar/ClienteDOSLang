@@ -39,7 +39,6 @@ export class Asignacion extends Instruccion {
                             sim.valor = valExp1;
                         } else {
                             errores.push({
-                                numero: errores.length + 1,
                                 valor: 'Semántico',
                                 descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '".',
                                 linea: this.linea,
@@ -48,7 +47,6 @@ export class Asignacion extends Instruccion {
                         }
                     } else {
                         errores.push({
-                            numero: errores.length + 1,
                             valor: 'Semántico',
                             descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '".',
                             linea: this.linea,
@@ -76,7 +74,6 @@ export class Asignacion extends Instruccion {
                                     sim.valor[Number(valExp1)] = Number(valExp2);
                                 } else {
                                     errores.push({
-                                        numero: errores.length + 1,
                                         valor: 'Semántico',
                                         descripcion: 'Posición y valor debe ser número.',
                                         linea: this.linea,
@@ -85,7 +82,6 @@ export class Asignacion extends Instruccion {
                                 }
                             } else {
                                 errores.push({
-                                    numero: errores.length + 1,
                                     valor: 'Semántico',
                                     descripcion: 'Variable "' + this.target.toLowerCase() + '" no es arreglo.',
                                     linea: this.linea,
@@ -98,7 +94,6 @@ export class Asignacion extends Instruccion {
                                 if (this.exp2.Tipo == Tipo.NUMERO) {
                                     if (isNullOrUndefined(valExp1[Number(valExp2)])) {
                                         errores.push({
-                                            numero: errores.length + 1,
                                             valor: 'Semántico',
                                             descripcion: 'No hay valor en la posición ' + valExp2 + ' del arreglo.',
                                             linea: this.linea,
@@ -118,7 +113,6 @@ export class Asignacion extends Instruccion {
                                             sim.valor = valExp1[Number(valExp2)];
                                         } else {
                                             errores.push({
-                                                numero: errores.length + 1,
                                                 valor: 'Semántico',
                                                 descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '".',
                                                 linea: this.linea,
@@ -128,7 +122,6 @@ export class Asignacion extends Instruccion {
                                     }
                                 } else {
                                     errores.push({
-                                        numero: errores.length + 1,
                                         valor: 'Semántico',
                                         descripcion: 'Posición debe ser número.',
                                         linea: this.linea,
@@ -137,7 +130,6 @@ export class Asignacion extends Instruccion {
                                 }
                             } else {
                                 errores.push({
-                                    numero: errores.length + 1,
                                     valor: 'Semántico',
                                     descripcion: 'Variable de acceso no es arreglo.',
                                     linea: this.linea,
@@ -177,10 +169,14 @@ export class Asignacion extends Instruccion {
                                 }
                                 case Op.DIVISION:{
                                     if(Number(valExp2) != 0){
-                                        sim.valor = Number(valExp1) / Number(valExp2);
+                                        if((Number(valExp1)%1 != 0) || (Number(valExp2)%1 != 0)){
+                                            //Es decimal
+                                            sim.valor = (Number(valExp1) / Number(valExp2));
+                                        } else {
+                                            sim.valor = Math.floor(Number(valExp1) / Number(valExp2));
+                                        }
                                     } else {
                                         errores.push({
-                                            numero: errores.length + 1,
                                             valor: 'Semántico',
                                             descripcion: 'No se puede dividir entre 0.',
                                             linea: this.linea,
@@ -190,13 +186,17 @@ export class Asignacion extends Instruccion {
                                     break;
                                 }
                                 case Op.MODULO:{
-                                    sim.valor = Number(valExp1) % Number(valExp2);
+                                    if((Number(valExp1)%1 != 0) || (Number(valExp2)%1 != 0)){
+                                        //Es decimal
+                                        sim.valor = Number(valExp1) % Number(valExp2);
+                                    } else {
+                                        sim.valor =Math.floor(Number(valExp1) % Number(valExp2));
+                                    }
                                     break;
                                 }
                             }
                         } else {
                             errores.push({
-                                numero: errores.length + 1,
                                 valor: 'Semántico',
                                 descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '".',
                                 linea: this.linea,
@@ -205,7 +205,6 @@ export class Asignacion extends Instruccion {
                         }
                     } else {
                         errores.push({
-                            numero: errores.length + 1,
                             valor: 'Semántico',
                             descripcion: 'No se pudo realizar la operaciópn aritmética.',
                             linea: this.linea,

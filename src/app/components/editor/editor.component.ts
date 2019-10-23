@@ -92,6 +92,7 @@ export class EditorComponent implements OnInit {
   mensaje2 = '';
 
   errorEditor: ErrorInterface[] = [];
+  errorEjecucion: ErrorInterface[] = [];
 
   reportes: FileInterface[]=[];
 
@@ -136,9 +137,12 @@ export class EditorComponent implements OnInit {
         this.contenido = contenido;
         this.codeEditor3d.setValue(this.contenido.content.toString());
         this.codeEditor3d.navigateLineEnd();
+
+        this.errorEditor = contenido.errors;
       },
       (error) =>{
-        this.error = error;
+        this.error = "Error de conexión, inténtelo nuevamente.";
+        console.log(error.toString());
       }
     );
     //console.log("archivos->"+this.files);
@@ -150,14 +154,14 @@ export class EditorComponent implements OnInit {
     this.error2 = '';
     this.mensaje2 = '';
 
-    this.errorEditor = [];
+    this.errorEjecucion = [];
     this.consolaEditor.setValue('');
     this.consolaEditor.gotoLine(1, 0, false);
 
     let ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
     //ast.ejecutar(this.consolaEditor, this.errorEditor);
     if(ast){
-      ast.ejecutar(this.consolaEditor, this.errorEditor);
+      ast.ejecutar(this.consolaEditor, this.errorEjecucion);
     }
 
   }

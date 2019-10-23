@@ -48,7 +48,6 @@ export class Call extends Instruccion {
 
         } else {
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Método "' + this.id.toLowerCase() + '" no definido.',
                 linea: this.linea,

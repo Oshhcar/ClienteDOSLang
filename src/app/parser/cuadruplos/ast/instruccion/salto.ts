@@ -19,7 +19,6 @@ export class Salto extends Instruccion{
         }
 
         errores.push({
-            numero: errores.length+1,
             valor: 'Semántico',
             descripcion: 'Etiqueta "' + this.label.toUpperCase() + '" no definida.',
             linea: this.linea,

@@ -19,7 +19,6 @@ export class Metodo extends Instruccion {
 
         if(!(this.id === this.id2)){
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Identificadores  de "Begin" y "End" no coinciden.',
                 linea: this.linea,
@@ -36,7 +35,6 @@ export class Metodo extends Instruccion {
 
         } else {
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Método "' + this.id.toLowerCase() + '" ya definido.',
                 linea: this.linea,

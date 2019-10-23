@@ -24,7 +24,6 @@ export class Label extends Instruccion{
 
         } else {
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Etiqueta "' + this.label.toUpperCase() + '" ya definida.',
                 linea: this.linea,

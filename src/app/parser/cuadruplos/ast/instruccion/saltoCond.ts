@@ -65,7 +65,6 @@ export class SaltoCond extends Instruccion{
                     }
                 } else{
                     errores.push({
-                        numero: errores.length + 1,
                         valor: 'Semántico',
                         descripcion: 'No se pudo realizar la operaciópn relacional.',
                         linea: this.linea,
@@ -76,7 +75,6 @@ export class SaltoCond extends Instruccion{
 
         } else {
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Etiqueta "' + this.label.toUpperCase() + '" no definida.',
                 linea: this.linea,

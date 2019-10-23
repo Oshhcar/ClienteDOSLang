@@ -18,7 +18,6 @@ export class Identificador extends Expresion{
             return s.valor;
         } else {
             errores.push({
-                numero: errores.length+1,
                 valor: 'Semántico',
                 descripcion: 'Variable "' + this.id.toLowerCase() + '" no definida.',
                 linea: this.linea,

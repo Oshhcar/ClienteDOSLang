@@ -58,6 +58,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Parser</th>
                                 <th>Error</th>
                                 <th>Descripción</th>
                                 <th>Línea</th>
@@ -66,7 +67,16 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let e of errorEditor">
-                                <td>{{e.numero}}</td>
+                                <td>{{errorEditor.indexOf(e)+1}}</td>
+                                <td>Pascal</td>
+                                <td>{{e.valor}}</td>
+                                <td>{{e.descripcion}}</td>
+                                <td>{{e.linea}}</td>
+                                <td>{{e.columna}}</td>
+                            </tr>
+                            <tr *ngFor="let e of errorEjecucion">
+                                <td>{{errorEjecucion.indexOf(e)+1+errorEditor.length}}</td>
+                                <td>Cuádruplos</td>
                                 <td>{{e.valor}}</td>
                                 <td>{{e.descripcion}}</td>
                                 <td>{{e.linea}}</td>
