@@ -3,16 +3,9 @@ import { Simbolo, Tipo } from "./simbolo.interface";
 export class Entorno {
 
     Simbolos: Simbolo[];
-    G: Entorno;
 
-    constructor(public Display: Entorno){
+    constructor(){
         this.Simbolos = [];
-
-        if(Display){
-            this.G = this.Display.G;
-        } else {
-            this.G = null;
-        }
     }
 
     addSimbolo(s: Simbolo){
@@ -38,8 +31,8 @@ export class Entorno {
     }
 
     getIdentificador(id: String): Simbolo{
-        for(let i = 0; i < this.G.Simbolos.length; i++){
-            let s = this.G.Simbolos[i];
+        for(let i = 0; i < this.Simbolos.length; i++){
+            let s = this.Simbolos[i];
             if(s.id === id){
                 return s;
             }
@@ -64,8 +57,8 @@ export class Entorno {
 
     getMetodo(id: String): Simbolo{
 
-        for(let i = 0; i < this.G.Simbolos.length; i++){
-            let s = this.G.Simbolos[i];
+        for(let i = 0; i < this.Simbolos.length; i++){
+            let s = this.Simbolos[i];
             if(s.tipo == Tipo.METODO){
                 if(s.id === id){
                     return s;

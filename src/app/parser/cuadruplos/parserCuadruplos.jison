@@ -69,6 +69,7 @@ identifier          ({letter}|"_")({letter}|{digit}|"_")*
     const Salto = require('./ast/instruccion/salto').Salto;
     const SaltoCond = require('./ast/instruccion/saltoCond').SaltoCond;
     const Metodo = require('./ast/instruccion/metodo').Metodo;
+    const End = require('./ast/instruccion/end').End;
     const Temporal = require('./ast/expresion/temporal').Temporal;
     const Call = require('./ast/instruccion/call').Call;
 %}
@@ -105,8 +106,10 @@ INSTRUCTION
         { $$ = new Label($1, (yylineno + 1), (@1.first_column + 1)); }
     | JUMP
         { $$ = $1; }
-    | begin comma comma comma identifier BLOCKS end comma comma comma identifier 
-        { $$ = new Metodo($5, $11, $6, (yylineno + 1), (@1.first_column + 1)); }
+    | begin comma comma comma identifier   
+        { $$ = new Metodo($5, (yylineno + 1), (@1.first_column + 1)); }
+    | end comma comma comma identifier
+        { $$ = new End($5, (yylineno + 1), (@1.first_column + 1)); }
     | call comma comma comma identifier
         { $$ = new Call($5, (yylineno + 1), (@1.first_column + 1)); }
     | print '('  '%' CHART comma LITERAL ')' 
@@ -176,34 +179,6 @@ COND
         { $$ = 4; }
     | jle
         { $$ = 5; }
-    ;
-
-BLOCKS
-    : BLOCK 
-        {
-            $$ = [];
-            $$.push($1);
-        }
-    | BLOCKS BLOCK
-        {
-            $$ = $1;
-            $$.push($2);   
-        }
-    ;
-
-BLOCK
-    :  ASSIGNMENT
-        { $$ = $1; }
-    | label colon
-        { $$ = new Label($1, (yylineno + 1), (@1.first_column + 1)); }
-    | JUMP
-        { $$ = $1; }
-    | call comma comma comma identifier
-        { $$ = new Call($5, (yylineno + 1), (@1.first_column + 1)); }
-    | print '('  '%' CHART comma LITERAL ')' 
-        { $$ = new Print($4, $6, (yylineno + 1), (@1.first_column + 1)); }
-    | call comma comma comma in_vaule
-        { }
     ;
 
 CHART

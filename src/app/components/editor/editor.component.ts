@@ -10,6 +10,9 @@ import 'ace-builds/src-noconflict/mode-text';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { ContenidoInterface } from 'src/app/models/contenido.interface';
 import { isNullOrUndefined } from 'util';
+import { Entorno } from 'src/app/parser/cuadruplos/ast/entorno/entorno';
+import { Simbolo, Tipo } from 'src/app/parser/cuadruplos/ast/entorno/simbolo.interface';
+import { AST } from 'src/app/parser/cuadruplos/ast/ast';
 
 const THEME = 'ace/theme/github';
 const LANG = 'ace/mode/java';
@@ -125,6 +128,15 @@ export class EditorComponent implements OnInit {
 
   breakpoints: number[] = [];
 
+  stack: Simbolo = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
+  heap: Simbolo = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
+  P: Simbolo = {id: "p", valor: 0, tipo: Tipo.NUMERO};
+  H: Simbolo = {id: "h", valor: 0, tipo: Tipo.NUMERO};
+
+  AST: AST;
+
+  Tiempo: number = 3;
+
   onGuardar() {
     //console.log(this.codeEditor.getValue());
     var blob = new Blob([this.codeEditor.getValue()], { type: 'text/plain' });
@@ -188,34 +200,100 @@ export class EditorComponent implements OnInit {
     let ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
     //ast.ejecutar(this.consolaEditor, this.errorEditor);
     if (ast) {
-      ast.ejecutar(this.consolaEditor, this.errorEjecucion);
+      let entorno = new Entorno();
+
+      this.P = {id: "p", valor: 0, tipo: Tipo.NUMERO};
+      this.H = {id: "h", valor: 0, tipo: Tipo.NUMERO};
+      this.stack = {id: "stack", valor: [], tipo: Tipo.ARREGLO};
+      this.heap = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
+
+      entorno.addSimbolo(this.P);
+      entorno.addSimbolo(this.H);
+      entorno.addSimbolo(this.stack);
+      entorno.addSimbolo(this.heap);
+
+      ast.ejecutar(this.consolaEditor, this.errorEjecucion, entorno);
+
+      this.stack.valor[174] = null; 
     }
 
   }
 
   async onDepurar() {
+
+    if(this.AST){
+      if(this.AST.Continuar){
+        return;
+      }
+    }
+
     this.error2 = '';
     this.mensaje2 = '';
     this.codeEditor3d.setReadOnly(true);
 
-    let i = 0;
-    while (i < 33) {
-      this.codeEditor3d.gotoLine(i, 0, true);
-      this.codeEditor3d.setHighlightActiveLine(true);
-      this.codeEditor3d.focus();
+    this.errorEjecucion = [];
+    this.consolaEditor.setValue('');
+    this.consolaEditor.gotoLine(1, 0, false);
 
-      if(!isNullOrUndefined(this.breakpoints[i])){
-        break;
-      }
+    this.AST = parserCuadruplos.parse(this.codeEditor3d.getValue());
+    //ast.ejecutar(this.consolaEditor, this.errorEditor);
+    if (this.AST) {
+      let entorno = new Entorno();
 
-      await this.delay(1000);
-      i++;
+      this.P = {id: "p", valor: 0, tipo: Tipo.NUMERO};
+      this.H = {id: "h", valor: 0, tipo: Tipo.NUMERO};
+      this.stack = {id: "stack", valor: [], tipo: Tipo.ARREGLO};
+      this.heap = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
+
+      entorno.addSimbolo(this.P);
+      entorno.addSimbolo(this.H);
+      entorno.addSimbolo(this.stack);
+      entorno.addSimbolo(this.heap);
+
+      this.AST.Tiempo = 400/this.Tiempo;
+      this.AST.Breakpoints = this.breakpoints;
+      this.AST.debugear(this.consolaEditor, this.errorEjecucion, entorno, this.codeEditor3d);
     }
+
     this.codeEditor3d.setReadOnly(false);
   }
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  onPausa() {
+    if(this.AST){
+      this.AST.Continuar = false;
+    }
+  }
+
+  onContinuar(){
+    if(this.AST){
+      this.AST.Continuar = true;
+      this.AST.ejecutarNodoDebug();
+    }
+  }
+
+  onSiguiente(){
+    if(this.AST){
+      this.AST.Continuar = false;
+      this.AST.ejecutarNodoDebug();
+    }
+  }
+
+  onRango(){
+    if(this.AST){
+      this.AST.Tiempo = 400/this.Tiempo;
+    }
+  }
+
+  onSiguienteBreakpoint(){
+    if(this.AST){
+      this.AST.Continuar = false;
+      this.AST.ejecutarNodoDebug();
+      this.AST.untilBreakpoint();
+    }
   }
 
 }
