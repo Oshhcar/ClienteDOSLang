@@ -24,7 +24,7 @@ export class SaltoCond extends Instruccion{
             let valExp2 = this.exp2.getValor(e, log, errores);
 
             if(!isNullOrUndefined(valExp1) && !isNullOrUndefined(valExp2)){
-                if(this.exp1.Tipo == Tipo.NUMERO && this.exp2.Tipo == Tipo.NUMERO){
+                if((this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL) && (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL)){
                     switch(this.tipoSalto){
                         case TipoSalto.IGUAL:{
                             if(Number(valExp1) == Number(valExp2)){

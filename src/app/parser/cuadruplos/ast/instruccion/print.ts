@@ -22,9 +22,14 @@ export class Print extends Instruccion{
             if (this.char == "c") {
                 log.setValue(log.getValue() + String.fromCharCode(valExpr));
             } else if(this.char == "e"){
-                log.setValue(log.getValue() + Math.round(valExpr));
+                log.setValue(log.getValue() + Math.floor(Number(valExpr)));
             } else {
-                log.setValue(log.getValue() + parseFloat(valExpr)/*.toFixed(5)*/);
+                if(Number(valExpr) - Math.floor(Number(valExpr)) == 0){
+                    log.setValue(log.getValue() + Number(valExpr) + ".0");
+                } else {
+                    log.setValue(log.getValue() + Number(valExpr));
+                }
+                //log.setValue(log.getValue() + parseFloat(valExpr)/*.toFixed(5)*/);
             }
             log.gotoPageDown();
         }

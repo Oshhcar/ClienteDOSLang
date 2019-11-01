@@ -6,10 +6,12 @@ export interface Simbolo {
 
 
 export const enum Tipo{
-    NUMERO, //0
-    ARREGLO, //1
-    VAR, //2
-    LABEL, //3
-    BOOL, //4
-    METODO //5
+    //NUMERO, //0
+    ENTERO, //0
+    DECIMAL, //1
+    ARREGLO, //2
+    VAR, //3
+    LABEL, //4
+    BOOL, //5
+    METODO //6
 }

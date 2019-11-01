@@ -25,18 +25,19 @@ export class Asignacion extends Instruccion {
         if (!isNullOrUndefined(valExp1)) {
             if (this.op == Op.IGUAL) {
                 if (isNullOrUndefined(this.exp2)) {
-                    if (this.exp1.Tipo == Tipo.NUMERO) {
+                    if (this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL) {
                         let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                         if (isNullOrUndefined(sim)) {
                             sim = {
                                 id: this.target.toLowerCase(),
                                 valor: null,
-                                tipo: Tipo.NUMERO
+                                tipo: this.exp1.Tipo
                             }
                             e.addSimbolo(sim);
                         }
-                        if (sim.tipo == Tipo.NUMERO) {
+                        if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
                             sim.valor = valExp1;
+                            sim.tipo == this.exp1.Tipo;
                         } else {
                             errores.push({
                                 valor: 'Semántico',
@@ -70,12 +71,21 @@ export class Asignacion extends Instruccion {
                             }
 
                             if (sim.tipo == Tipo.ARREGLO) {
-                                if (this.exp1.Tipo == Tipo.NUMERO && this.exp2.Tipo == Tipo.NUMERO) {
-                                    sim.valor[Number(valExp1)] = Number(valExp2);
+                                if (this.exp1.Tipo == Tipo.ENTERO) {
+                                    if(this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL){
+                                        sim.valor[Number(valExp1)] = Number(valExp2);
+                                    } else {
+                                        errores.push({
+                                            valor: 'Semántico',
+                                            descripcion: 'Valor debe ser entero o decimal.',
+                                            linea: this.linea,
+                                            columna: this.columna
+                                        });
+                                    }
                                 } else {
                                     errores.push({
                                         valor: 'Semántico',
-                                        descripcion: 'Posición y valor debe ser número.',
+                                        descripcion: 'Posición del arreglo debe ser entero.',
                                         linea: this.linea,
                                         columna: this.columna
                                     });
@@ -91,7 +101,7 @@ export class Asignacion extends Instruccion {
 
                         } else {
                             if (this.exp1.Tipo == Tipo.ARREGLO) {
-                                if (this.exp2.Tipo == Tipo.NUMERO) {
+                                if (this.exp2.Tipo == Tipo.ENTERO) {
                                     if (isNullOrUndefined(valExp1[Number(valExp2)])) {
                                         errores.push({
                                             valor: 'Semántico',
@@ -101,16 +111,27 @@ export class Asignacion extends Instruccion {
                                         });
                                     } else {
                                         let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
+                                        
+                                        let valor = valExp1[Number(valExp2)];
+                                        let tipo : Tipo;
+
+                                        if(valor%1 == 0){
+                                            tipo = Tipo.ENTERO;
+                                        } else {
+                                            tipo = Tipo.DECIMAL;
+                                        }
+                                        
                                         if (isNullOrUndefined(sim)) {
                                             sim = {
                                                 id: this.target.toLowerCase(),
                                                 valor: null,
-                                                tipo: Tipo.NUMERO
+                                                tipo: tipo
                                             }
                                             e.addSimbolo(sim);
                                         }
-                                        if (sim.tipo == Tipo.NUMERO) {
-                                            sim.valor = valExp1[Number(valExp2)];
+                                        if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
+                                            sim.valor = valor;
+                                            //sim.tipo = tipo;
                                         } else {
                                             errores.push({
                                                 valor: 'Semántico',
@@ -123,7 +144,7 @@ export class Asignacion extends Instruccion {
                                 } else {
                                     errores.push({
                                         valor: 'Semántico',
-                                        descripcion: 'Posición debe ser número.',
+                                        descripcion: 'Posición debe ser número entero.',
                                         linea: this.linea,
                                         columna: this.columna
                                     });
@@ -143,38 +164,50 @@ export class Asignacion extends Instruccion {
                 let valExp2 = this.exp2.getValor(e, log, errores);
 
                 if (!isNullOrUndefined(valExp2)) {
-                    if (this.exp1.Tipo == Tipo.NUMERO && this.exp2.Tipo == Tipo.NUMERO) {
+                    if ((this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL ) && (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL)) {
+                        
+                        let tipoDominante;
+
+                        if(this.exp1.Tipo == Tipo.DECIMAL || this.exp2.Tipo == Tipo.DECIMAL){
+                            tipoDominante = Tipo.DECIMAL;
+                        } else {
+                            tipoDominante = Tipo.ENTERO;
+                        }
+
                         let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                         if (isNullOrUndefined(sim)) {
                             sim = {
                                 id: this.target.toLowerCase(),
                                 valor: null,
-                                tipo: Tipo.NUMERO
+                                tipo: tipoDominante
                             }
                             e.addSimbolo(sim);
                         }
-                        if (sim.tipo == Tipo.NUMERO) {
+                        if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
                             switch(this.op){
                                 case Op.SUMA:{
                                     sim.valor = Number(valExp1) + Number(valExp2);
+                                    sim.tipo = tipoDominante;
                                     break;
                                 }
                                 case Op.RESTA:{
                                     sim.valor = Number(valExp1) - Number(valExp2);
+                                    sim.tipo = tipoDominante;
                                     break;
                                 }
                                 case Op.MULTIPLICACION:{
                                     sim.valor = Number(valExp1) * Number(valExp2);
+                                    sim.tipo = tipoDominante;
                                     break;
                                 }
                                 case Op.DIVISION:{
                                     if(Number(valExp2) != 0){
-                                        if((Number(valExp1)%1 != 0) || (Number(valExp2)%1 != 0)){
-                                            //Es decimal
+                                        if(tipoDominante == Tipo.DECIMAL){
                                             sim.valor = (Number(valExp1) / Number(valExp2));
                                         } else {
                                             sim.valor = Math.floor(Number(valExp1) / Number(valExp2));
                                         }
+                                        sim.tipo = tipoDominante;
                                     } else {
                                         errores.push({
                                             valor: 'Semántico',
@@ -186,12 +219,12 @@ export class Asignacion extends Instruccion {
                                     break;
                                 }
                                 case Op.MODULO:{
-                                    if((Number(valExp1)%1 != 0) || (Number(valExp2)%1 != 0)){
-                                        //Es decimal
+                                    if(tipoDominante == Tipo.DECIMAL){
                                         sim.valor = Number(valExp1) % Number(valExp2);
                                     } else {
                                         sim.valor =Math.floor(Number(valExp1) % Number(valExp2));
                                     }
+                                    sim.tipo = tipoDominante;
                                     break;
                                 }
                             }

@@ -46,7 +46,10 @@
                 <a class="nav-link" id="{{file.name}}errores-tab" data-toggle="tab" href="#{{file.name}}errores"
                     role="tab" attr.aria-controls="{{file.name}}errores" aria-selected="false">Errores</a>
             </li>
-
+            <li class="nav-item">
+                <a class="nav-link" id="{{file.name}}simbolos-tab" data-toggle="tab" href="#{{file.name}}simbolos" role="tab"
+                    attr.aria-controls="{{file.name}}simbolos" aria-selected="false">Tabla de Símbolos</a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" id="{{file.name}}heap-tab" data-toggle="tab" href="#{{file.name}}heap" role="tab"
                     attr.aria-controls="{{file.name}}heap" aria-selected="false">Estructuras</a>
@@ -110,7 +113,39 @@
                     </table>
                 </div>
             </div>
-
+            <div class="tab-pane fade" id="{{file.name}}simbolos" role="tabpanel"
+                attr.aria-labelledby="{{file.name}}simbolos-tab">
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Id</th>
+                                <th>Tipo</th>
+                                <th>Rol</th>
+                                <th>Tamaño</th>
+                                <th>Posición</th>
+                                <th>Ámbito</th>
+                                <th>No. Parámetros</th>
+                                <th>Tipo Parámetro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let s of simbolos; let i = index">
+                                <td>{{i+1}}</td>
+                                <td>{{s.id}}</td>
+                                <td>{{s.tipo}}</td>
+                                <td>{{s.rol}}</td>
+                                <td>{{s.tam}}</td>
+                                <td>{{s.pos}}</td>
+                                <td>{{s.ambito}}</td>
+                                <td>{{s.numParam}}</td>
+                                <td>{{s.tipoParam}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="tab-pane fade" id="{{file.name}}heap" role="tabpanel"
                 attr.aria-labelledby="{{file.name}}heap-tab">
                 <div class="row">

@@ -284,12 +284,12 @@ export class AST {
 
             if (isNullOrUndefined(this.metodo)) {
                 if (!(nodo instanceof Label) && !(nodo instanceof Metodo)) {
-                    
+
                     this.Editor.gotoLine(nodo.linea, 0, true);
                     this.Editor.setHighlightActiveLine(true);
                     this.Editor.focus();
-        
-                    if(this.Continuar){
+
+                    if (this.Continuar) {
                         await this.delay(this.Tiempo);
                     }
 
@@ -307,15 +307,6 @@ export class AST {
                         let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
                         if (!isNullOrUndefined(salto)) {
                             this.i = salto;
-
-                            nodo = this.nodos[this.i];
-                            this.Editor.gotoLine(nodo.linea, 0, true);
-                            this.Editor.setHighlightActiveLine(true);
-                            this.Editor.focus();
-                
-                            if(this.Continuar){
-                                await this.delay(this.Tiempo);
-                            }
                         }
                     }
                 } else {

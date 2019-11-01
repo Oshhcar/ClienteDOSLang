@@ -13,6 +13,7 @@ import { isNullOrUndefined } from 'util';
 import { Entorno } from 'src/app/parser/cuadruplos/ast/entorno/entorno';
 import { Simbolo, Tipo } from 'src/app/parser/cuadruplos/ast/entorno/simbolo.interface';
 import { AST } from 'src/app/parser/cuadruplos/ast/ast';
+import { SimboloInterface } from 'src/app/models/simbolo.interface';
 
 const THEME = 'ace/theme/github';
 const LANG = 'ace/mode/java';
@@ -121,6 +122,7 @@ export class EditorComponent implements OnInit {
 
   errorEditor: ErrorInterface[] = [];
   errorEjecucion: ErrorInterface[] = [];
+  simbolos: SimboloInterface[] = [];
 
   reportes: FileInterface[] = [];
 
@@ -130,8 +132,8 @@ export class EditorComponent implements OnInit {
 
   stack: Simbolo = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
   heap: Simbolo = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
-  P: Simbolo = {id: "p", valor: 0, tipo: Tipo.NUMERO};
-  H: Simbolo = {id: "h", valor: 0, tipo: Tipo.NUMERO};
+  P: Simbolo = {id: "p", valor: 0, tipo: Tipo.ENTERO};
+  H: Simbolo = {id: "h", valor: 0, tipo: Tipo.ENTERO};
 
   AST: AST;
 
@@ -178,10 +180,11 @@ export class EditorComponent implements OnInit {
           this.codeEditor3d.navigateLineEnd();
 
           this.errorEditor = contenido.errors;
+          this.simbolos = contenido.table;
         },
         (error) => {
           this.error = "Error de conexión, inténtelo nuevamente.";
-          console.log(error.toString());
+          console.log(error);
         }
       );
     //console.log("archivos->"+this.files);
@@ -196,14 +199,14 @@ export class EditorComponent implements OnInit {
     this.errorEjecucion = [];
     this.consolaEditor.setValue('');
     this.consolaEditor.gotoLine(1, 0, false);
-
+    //verificar que no esté vacío.
     let ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
     //ast.ejecutar(this.consolaEditor, this.errorEditor);
     if (ast) {
       let entorno = new Entorno();
 
-      this.P = {id: "p", valor: 0, tipo: Tipo.NUMERO};
-      this.H = {id: "h", valor: 0, tipo: Tipo.NUMERO};
+      this.P = {id: "p", valor: 0, tipo: Tipo.ENTERO};
+      this.H = {id: "h", valor: 0, tipo: Tipo.ENTERO};
       this.stack = {id: "stack", valor: [], tipo: Tipo.ARREGLO};
       this.heap = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
 
@@ -212,9 +215,7 @@ export class EditorComponent implements OnInit {
       entorno.addSimbolo(this.stack);
       entorno.addSimbolo(this.heap);
 
-      ast.ejecutar(this.consolaEditor, this.errorEjecucion, entorno);
-
-      this.stack.valor[174] = null; 
+      ast.ejecutar(this.consolaEditor, this.errorEjecucion, entorno);//borre asignacion a 147
     }
 
   }
@@ -240,8 +241,8 @@ export class EditorComponent implements OnInit {
     if (this.AST) {
       let entorno = new Entorno();
 
-      this.P = {id: "p", valor: 0, tipo: Tipo.NUMERO};
-      this.H = {id: "h", valor: 0, tipo: Tipo.NUMERO};
+      this.P = {id: "p", valor: 0, tipo: Tipo.ENTERO};
+      this.H = {id: "h", valor: 0, tipo: Tipo.ENTERO};
       this.stack = {id: "stack", valor: [], tipo: Tipo.ARREGLO};
       this.heap = {id: "heap", valor: [], tipo: Tipo.ARREGLO};
 

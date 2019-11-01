@@ -7,7 +7,9 @@
 comment_simple      "//"[^\r\n]*
 comment_multi       "/*""/"*([^*/]|[^*]"/"|"*"[^/])*"*"*"*/"
 digit               [0-9]
-number             {digit}+("."{digit}+)?
+/*number             {digit}+("."{digit}+)?*/
+entero              {digit}+
+decimal             {digit}+"."{digit}+
 label               "l"{digit}+
 temp                "t"{digit}+
 letter              [a-zA-ZñÑ]
@@ -51,7 +53,9 @@ identifier          ({letter}|"_")({letter}|{digit}|"_")*
 
 {label}             return 'label'
 {temp}              return 'temp'
-{number}            return 'number'
+/*{number}            return 'number'*/
+{decimal}           return 'decimal'
+{entero}            return 'entero'
 {identifier}        return 'identifier'
 
 <<EOF>>             return 'EOF'
@@ -151,8 +155,10 @@ E
     ;
 
 LITERAL
-    : number
+    : entero
         { $$ = new Literal(0, Number(yytext), (yylineno + 1), (@1.first_column + 1)); }
+    | decimal
+        { $$ = new Literal(1, Number(yytext), (yylineno + 1), (@1.first_column + 1)); }
     | temp
         { $$ = new Temporal($1, (yylineno + 1), (@1.first_column + 1)); }
     | identifier
