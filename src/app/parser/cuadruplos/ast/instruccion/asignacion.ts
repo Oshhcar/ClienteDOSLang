@@ -109,6 +109,15 @@ export class Asignacion extends Instruccion {
                                             linea: this.linea,
                                             columna: this.columna
                                         });
+                                        errores.push({
+                                            valor: 'Semántico',
+                                            descripcion: 'NullPointerException.',
+                                            linea: this.linea,
+                                            columna: this.columna
+                                        });
+                                        log.setValue(log.getValue() + "\nNullPointerException en Línea: " + this.linea + ".\n");
+                                        log.gotoPageDown();
+                                        e.NullPointer = true;
                                     } else {
                                         let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                                         
@@ -215,6 +224,15 @@ export class Asignacion extends Instruccion {
                                             linea: this.linea,
                                             columna: this.columna
                                         });
+                                        errores.push({
+                                            valor: 'Semántico',
+                                            descripcion: 'ArithmethicException',
+                                            linea: this.linea,
+                                            columna: this.columna
+                                        });
+                                        log.setValue(log.getValue() + "\nArithmethicException en Línea: " + this.linea + ".\n");
+                                        log.gotoPageDown();
+                                        e.NullPointer = true;
                                     }
                                     break;
                                 }

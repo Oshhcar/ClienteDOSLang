@@ -114,6 +114,8 @@ export class AST {
                     this.metodo = null;
                 }
             }
+
+            if(entorno.NullPointer) return;
         }
 
         /*
@@ -213,6 +215,7 @@ export class AST {
             if (band) {
                 this.untilBreakpoint();
             }
+            if(entorno.NullPointer) return;
         }
 
 
@@ -266,6 +269,7 @@ export class AST {
                     }
                 }
                 this.i = i;
+                if(this.Entorno.NullPointer) return;
             }
 
             let nodo = this.nodos[this.i];
@@ -320,6 +324,7 @@ export class AST {
                 }
             }
             this.i++;
+            if(this.Entorno.NullPointer) return;
 
             if (this.Continuar) {
                 this.ejecutarNodoDebug();

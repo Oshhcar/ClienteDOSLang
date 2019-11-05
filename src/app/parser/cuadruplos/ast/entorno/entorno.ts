@@ -3,9 +3,11 @@ import { Simbolo, Tipo } from "./simbolo.interface";
 export class Entorno {
 
     Simbolos: Simbolo[];
+    NullPointer: boolean;
 
     constructor(){
         this.Simbolos = [];
+        this.NullPointer = false;
     }
 
     addSimbolo(s: Simbolo){
