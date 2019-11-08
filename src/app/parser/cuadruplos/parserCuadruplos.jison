@@ -76,6 +76,7 @@ identifier          ({letter}|"_")({letter}|{digit}|"_")*
     const End = require('./ast/instruccion/end').End;
     const Temporal = require('./ast/expresion/temporal').Temporal;
     const Call = require('./ast/instruccion/call').Call;
+    const Read = require('./ast/instruccion/read').Read;
 %}
 
 %start START
@@ -119,7 +120,7 @@ INSTRUCTION
     | print '('  '%' CHART comma LITERAL ')' 
         { $$ = new Print($4, $6, (yylineno + 1), (@1.first_column + 1)); }
     | call comma comma comma in_vaule
-        { }
+        { $$ = new Read((yylineno + 1), (@1.first_column + 1)); }
     ;
 
 ASSIGNMENT

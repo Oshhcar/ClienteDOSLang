@@ -6,6 +6,8 @@ import { SaltoCond } from './instruccion/saltoCond';
 import { Metodo } from './instruccion/metodo';
 import { End } from './instruccion/end';
 import { Call } from './instruccion/call';
+import { Read } from './instruccion/read';
+import { BanderaInterface } from 'src/app/models/bandera.interface';
 
 export class AST {
 
@@ -21,9 +23,13 @@ export class AST {
     public Tiempo: number;
     public Breakpoints: number[];
 
+    public Debugeando: boolean;
+    public DebugeandoUntilBreakpoint: boolean;
+    public Bandera: BanderaInterface;
+
     constructor(public nodos: any[]) { }
 
-    public ejecutar(log: any, errores: any, entorno: Entorno) {
+    public ejecutar(log: any, errores: any, entorno: Entorno, editor: any) {
 
         /*
         * Primera pasada para guardar Línea de Etiquetas y Métodos 
@@ -83,6 +89,16 @@ export class AST {
         this.retorna = [];
         this.metodo = null;
 
+        this.Log = log;
+        this.Errores = errores;
+        this.Entorno = entorno;
+        this.Editor = editor;
+        this.Continuar = true;
+        this.i = 0;
+        this.Debugeando = false;
+        this.Bandera.leerEntrada = false;
+        this.ejecutarNodo();
+        /*
         for (let i = 0; i < this.nodos.length; i++) {
             let nodo = this.nodos[i];
 
@@ -117,6 +133,7 @@ export class AST {
 
             if(entorno.NullPointer) return;
         }
+        */
 
         /*
         //entorno.Recorrer();
@@ -133,6 +150,52 @@ export class AST {
             columna: "3"
         })
         */
+    }
+
+    public ejecutarNodo() {
+        if (this.i < this.nodos.length) {
+            let nodo = this.nodos[this.i];
+
+            if (isNullOrUndefined(this.metodo)) {
+                if (!(nodo instanceof Label) && !(nodo instanceof Metodo)) {
+                    if (nodo instanceof Call) {
+                        let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                        if (!isNullOrUndefined(salto)) {
+                            this.retorna.push(this.i);
+                            this.i = salto;
+                        }
+                    } else if (nodo instanceof End) {
+                        this.i = this.retorna.pop();
+                    } else if (nodo instanceof Read) {
+                        this.Bandera.leerEntrada = true;
+                        this.Continuar = false;
+                    } else if (!(nodo instanceof Salto) && !(nodo instanceof SaltoCond)) {
+                        nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                    } else {
+                        let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                        if (!isNullOrUndefined(salto)) {
+                            this.i = salto;
+                        }
+                    }
+                } else {
+                    if (nodo instanceof Metodo) {
+                        this.metodo = nodo.id;
+                    }
+                }
+            } else {
+                if (nodo instanceof End) {
+                    this.metodo = null;
+                }
+            }
+            this.i++;
+            if (this.Entorno.NullPointer) return;
+
+            if (this.Continuar) {
+                this.ejecutarNodo();
+            }
+        } else {
+            this.Continuar = false;
+        }
     }
 
     public debugear(log: any, errores: any, entorno: Entorno, editor: any) {
@@ -193,7 +256,7 @@ export class AST {
          * Segunda Pasada, ejecutar todo lo que no sea Label y Metodo 
         */
         this.retorna = [];
-        metodo = null;
+        this.metodo = null;
 
         this.Log = log;
         this.Errores = errores;
@@ -201,6 +264,8 @@ export class AST {
         this.Editor = editor;
         this.Continuar = true;
         this.i = 0;
+        this.Debugeando = true;
+        this.DebugeandoUntilBreakpoint = false;
 
         if (this.Breakpoints.length > 0) {
             let band = false;
@@ -213,13 +278,14 @@ export class AST {
             }
 
             if (band) {
+                this.DebugeandoUntilBreakpoint = true;
                 this.untilBreakpoint();
+            } else {
+                this.ejecutarNodoDebug();
             }
-            if(entorno.NullPointer) return;
+        } else {
+            this.ejecutarNodoDebug();
         }
-
-
-        this.ejecutarNodoDebug();
     }
 
     delay(ms: number) {
@@ -228,55 +294,59 @@ export class AST {
 
     untilBreakpoint() {
         if (this.i < this.nodos.length) {
-            for (let i = this.i; i < this.nodos.length; i++) {
-                let nodo = this.nodos[i];
-                this.i = i;
+            let nodo = this.nodos[this.i];
 
-                if (!isNullOrUndefined(this.Breakpoints[nodo.linea])) {
-                    this.Continuar = false;
-                    this.Editor.gotoLine(nodo.linea, 0, true);
-                    this.Editor.setHighlightActiveLine(true);
-                    this.Editor.focus();
-                    return;
-                }
+            if (!isNullOrUndefined(this.Breakpoints[nodo.linea])) {
+                this.Continuar = false;
+                this.DebugeandoUntilBreakpoint = false;
+                this.Editor.gotoLine(nodo.linea, 0, true);
+                this.Editor.setHighlightActiveLine(true);
+                this.Editor.focus();
+            }
 
-                if (isNullOrUndefined(this.metodo)) {
-                    if (!(nodo instanceof Label) && !(nodo instanceof Metodo)) {
-                        if (nodo instanceof Call) {
-                            let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
-                            if (!isNullOrUndefined(salto)) {
-                                this.retorna.push(i);
-                            }
-                            i = salto;
-                        } else if (nodo instanceof End) {
-                            i = this.retorna.pop();
-                        } else if (!(nodo instanceof Salto) && !(nodo instanceof SaltoCond)) {
-                            nodo.ejecutar(this.Entorno, this.Log, this.Errores);
-                        } else {
-                            let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
-                            if (!isNullOrUndefined(salto)) {
-                                i = salto;
-                            }
+            if (isNullOrUndefined(this.metodo)) {
+                if (!(nodo instanceof Label) && !(nodo instanceof Metodo)) {
+                    if (nodo instanceof Call) {
+                        let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                        if (!isNullOrUndefined(salto)) {
+                            this.retorna.push(this.i);
                         }
+                        this.i = salto;
+                    } else if (nodo instanceof End) {
+                        this.i = this.retorna.pop();
+                    } else if (nodo instanceof Read) {
+                        this.Bandera.leerEntrada = true;
+                        this.Continuar = false;
+                    } else if (!(nodo instanceof Salto) && !(nodo instanceof SaltoCond)) {
+                        nodo.ejecutar(this.Entorno, this.Log, this.Errores);
                     } else {
-                        if (nodo instanceof Metodo) {
-                            this.metodo = nodo.id;
+                        let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                        if (!isNullOrUndefined(salto)) {
+                            this.i = salto;
                         }
                     }
                 } else {
-                    if (nodo instanceof End) {
-                        this.metodo = null;
+                    if (nodo instanceof Metodo) {
+                        this.metodo = nodo.id;
                     }
                 }
-                this.i = i;
-                if(this.Entorno.NullPointer) return;
+            } else {
+                if (nodo instanceof End) {
+                    this.metodo = null;
+                }
             }
+            this.i++;
+            if (this.Entorno.NullPointer) return;
 
-            let nodo = this.nodos[this.i];
+            if (this.Continuar) {
+                this.untilBreakpoint();
+            }
+        } else {
+
+            let nodo = this.nodos[this.i-1];
             this.Editor.gotoLine(nodo.linea, 0, true);
             this.Editor.setHighlightActiveLine(true);
             this.Editor.focus();
-        } else {
             this.Continuar = false;
         }
     }
@@ -305,6 +375,9 @@ export class AST {
                         }
                     } else if (nodo instanceof End) {
                         this.i = this.retorna.pop();
+                    } else if (nodo instanceof Read) {
+                        this.Bandera.leerEntrada = true;
+                        this.Continuar = false;
                     } else if (!(nodo instanceof Salto) && !(nodo instanceof SaltoCond)) {
                         nodo.ejecutar(this.Entorno, this.Log, this.Errores);
                     } else {
@@ -324,12 +397,16 @@ export class AST {
                 }
             }
             this.i++;
-            if(this.Entorno.NullPointer) return;
+            if (this.Entorno.NullPointer) return;
 
             if (this.Continuar) {
                 this.ejecutarNodoDebug();
             }
         } else {
+            let nodo = this.nodos[this.i-1];
+            this.Editor.gotoLine(nodo.linea, 0, true);
+            this.Editor.setHighlightActiveLine(true);
+            this.Editor.focus();
             this.Continuar = false;
         }
     }

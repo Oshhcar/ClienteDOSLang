@@ -15,19 +15,20 @@
     <div class="row">
         <div class="col-7">
             <button class="btn btn-dark" (click)="onEjecutar()">Ejecutar</button>
-        &nbsp;
+            &nbsp;
             <button class="btn btn-dark" (click)="onDepurar()">Depurar</button>
-        &nbsp;
+            &nbsp;
             <button class="btn btn-dark" (click)="onPausa()">Pausa</button>
-        &nbsp;
+            &nbsp;
             <button class="btn btn-dark" (click)="onContinuar()">Continuar</button>
-        &nbsp;
+            &nbsp;
             <button class="btn btn-dark" (click)="onSiguiente()">Siguiente</button>
-        &nbsp;
+            &nbsp;
             <button class="btn btn-dark" (click)="onSiguienteBreakpoint()">Saltar Breakpoint</button>
         </div>
         <div class="col-2">
-            <input type="range" class="custom-range" (click)="onRango()" min="1" max="6" id="rango" [(ngModel)]="Tiempo">
+            <input type="range" class="custom-range" (click)="onRango()" min="1" max="6" id="rango"
+                [(ngModel)]="Tiempo">
         </div>
         <div class="col-3">
 
@@ -47,8 +48,8 @@
                     role="tab" attr.aria-controls="{{file.name}}errores" aria-selected="false">Errores</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="{{file.name}}simbolos-tab" data-toggle="tab" href="#{{file.name}}simbolos" role="tab"
-                    attr.aria-controls="{{file.name}}simbolos" aria-selected="false">Tabla de Símbolos</a>
+                <a class="nav-link" id="{{file.name}}simbolos-tab" data-toggle="tab" href="#{{file.name}}simbolos"
+                    role="tab" attr.aria-controls="{{file.name}}simbolos" aria-selected="false">Tabla de Símbolos</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="{{file.name}}heap-tab" data-toggle="tab" href="#{{file.name}}heap" role="tab"
@@ -233,6 +234,21 @@
             </div>
 
         </div>
+    </div>
+    <div *ngIf="bandera.leerEntrada" class="card-footer">
+        <div class="alert alert-success">Se ha solicitado un valor.</div>
+        <div class="alert alert-danger" *ngIf="error3">{{error3}}</div>
+        <form class="form-inline" #formLectura="ngForm" name="lecturaForm" (ngSubmit)="onLectura()">
+            <div class="form-group mx-sm-3">
+                <div class="form-label-group">
+                    <input type="text" id="input" name="input" class="form-control" placeholder="Ingrese un valor"
+                        [(ngModel)]="lectura">
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary btn-block " type="submit">Enviar</button>
+            </div>
+        </form>
     </div>
     <div class="card-footer small text-muted">Desarrollado por Oscar Morales (omoralesveliz@gmail.com)</div>
 </div>
