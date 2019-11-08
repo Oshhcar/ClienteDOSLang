@@ -179,8 +179,14 @@ export class EditorComponent implements OnInit {
     this.mensaje = '';
     this.file.main = true;
 
+    this.error2 = '';
+    this.mensaje2 = '';
+    
     this.error3 = '';
     this.bandera.leerEntrada = false;
+
+    this.consolaEditor.setValue('');
+    this.consolaEditor.gotoLine(1, 0, false);
 
     this.socket.traducir(this.files)
       .subscribe(
@@ -208,7 +214,7 @@ export class EditorComponent implements OnInit {
         return;
       }
     }
-    
+
     this.error2 = '';
     this.mensaje2 = '';
 
@@ -422,6 +428,7 @@ export class EditorComponent implements OnInit {
         }
 
         if (correcto) {
+          this.lectura = '';
           this.stack.valor[direccionVal] = valor;
           if (struct == 0) {
             this.stack.valor[direccion] = valor;

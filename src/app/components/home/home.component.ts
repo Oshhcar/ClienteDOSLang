@@ -5,7 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { EditorComponent } from '../editor/editor.component';
 
 import { FileInterface } from '../../models/file.interface';
-import { isNullOrUndefined } from 'util';
+import { isNullOrUndefined, isUndefined } from 'util';
 
 @Component({
   selector: 'app-home',
@@ -30,6 +30,8 @@ export class HomeComponent implements OnInit {
 
   SelectedFiles : FileList;
 
+  name: String;
+
   ngOnInit() {
     if (this.router.url.toString() == '/') {
       this.router.navigate(['/inicio']);
@@ -41,12 +43,28 @@ export class HomeComponent implements OnInit {
   }
 
   addFile(){
+    let nombre:string;
+
+    if(!isNullOrUndefined(this.name)){
+      if(this.name.length > 0){
+        nombre = this.name.trim().split(' ').join('');
+        if(nombre.indexOf('.') > 0){
+          nombre = nombre.slice(0, nombre.indexOf('.'));
+        }
+      } else {
+        nombre = 'archivo' + this.contador++;
+      }
+    } else {
+      nombre = 'archivo' + this.contador++;
+    }
+
     this.nuevo = {
-      name: 'archivo'+this.contador++,
+      name: nombre,
       content: '',
       main: false
     }
     this.files.push(this.nuevo);
+    this.name = '';
   }
 
   deleteFile(pos: number){
@@ -74,6 +92,13 @@ export class HomeComponent implements OnInit {
   }
 
   nuevaPestaña(name: string, content: any){
+
+    if(name.indexOf('.') >= 0){
+      name = name.slice(0, name.indexOf('.'))
+    }
+    name = name.trim();
+    name =  name.split(" ").join("");
+
     this.files.push({name:name, content: content});
     //console.log(content);
   }
