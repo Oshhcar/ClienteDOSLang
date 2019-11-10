@@ -188,7 +188,10 @@ export class AST {
                 }
             }
             this.i++;
-            if (this.Entorno.NullPointer) return;
+            if (this.Entorno.NullPointer) {
+                this.Continuar = false;
+                return;
+            }
 
             if (this.Continuar) {
                 this.ejecutarNodo();
@@ -336,7 +339,10 @@ export class AST {
                 }
             }
             this.i++;
-            if (this.Entorno.NullPointer) return;
+            if (this.Entorno.NullPointer) {
+                this.Continuar = false;
+                return;
+            }
 
             if (this.Continuar) {
                 this.untilBreakpoint();
@@ -397,7 +403,10 @@ export class AST {
                 }
             }
             this.i++;
-            if (this.Entorno.NullPointer) return;
+            if (this.Entorno.NullPointer) {
+                this.Continuar = false;
+                return;
+            }
 
             if (this.Continuar) {
                 this.ejecutarNodoDebug();
