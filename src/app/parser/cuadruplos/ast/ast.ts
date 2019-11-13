@@ -361,12 +361,13 @@ export class AST {
             }
         }
 
-        let nodo = this.nodos[this.i - 2];
-        this.Editor.gotoLine(nodo.linea, 0, true);
-        this.Editor.setHighlightActiveLine(true);
-        this.Editor.focus();
-        this.Continuar = false;
-
+        if(this.i >= this.nodos.length) {
+            let nodo = this.nodos[this.i - 2];
+            this.Editor.gotoLine(nodo.linea, 0, true);
+            this.Editor.setHighlightActiveLine(true);
+            this.Editor.focus();
+            this.Continuar = false;
+        }
     }
 
     async ejecutarNodoDebug() {
@@ -424,11 +425,13 @@ export class AST {
             }
         }
 
-        let nodo = this.nodos[this.i - 2];
-        this.Editor.gotoLine(nodo.linea, 0, true);
-        this.Editor.setHighlightActiveLine(true);
-        this.Editor.focus();
-        this.Continuar = false;
+        if(this.i >= this.nodos.length){
+            let nodo = this.nodos[this.i - 2];
+            this.Editor.gotoLine(nodo.linea, 0, true);
+            this.Editor.setHighlightActiveLine(true);
+            this.Editor.focus();
+            this.Continuar = false;
+        }
 
     }
 }
