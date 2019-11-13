@@ -98,42 +98,6 @@ export class AST {
         this.Debugeando = false;
         this.Bandera.leerEntrada = false;
         this.ejecutarNodo();
-        /*
-        for (let i = 0; i < this.nodos.length; i++) {
-            let nodo = this.nodos[i];
-
-            if (isNullOrUndefined(this.metodo)) {
-                if (!(nodo instanceof Label) && !(nodo instanceof Metodo)) {
-                    if (nodo instanceof Call) {
-                        let salto = nodo.ejecutar(entorno, log, errores);
-                        if (!isNullOrUndefined(salto)) {
-                            this.retorna.push(i);
-                        }
-                        i = salto;
-                    } else if (nodo instanceof End) {
-                        i = this.retorna.pop();
-                    } else if (!(nodo instanceof Salto) && !(nodo instanceof SaltoCond)) {
-                        nodo.ejecutar(entorno, log, errores);
-                    } else {
-                        let salto = nodo.ejecutar(entorno, log, errores);
-                        if (!isNullOrUndefined(salto)) {
-                            i = salto;
-                        }
-                    }
-                } else {
-                    if (nodo instanceof Metodo) {
-                        this.metodo = nodo.id;
-                    }
-                }
-            } else {
-                if (nodo instanceof End) {
-                    this.metodo = null;
-                }
-            }
-
-            if(entorno.NullPointer) return;
-        }
-        */
 
         /*
         //entorno.Recorrer();
@@ -153,7 +117,8 @@ export class AST {
     }
 
     public ejecutarNodo() {
-        if (this.i < this.nodos.length) {
+
+        while (this.i < this.nodos.length) {
             let nodo = this.nodos[this.i];
 
             if (isNullOrUndefined(this.metodo)) {
@@ -187,19 +152,67 @@ export class AST {
                     this.metodo = null;
                 }
             }
+
             this.i++;
             if (this.Entorno.NullPointer) {
-                this.Continuar = false;
-                return;
+                break;
             }
 
-            if (this.Continuar) {
-                this.ejecutarNodo();
+            if (!this.Continuar) {
+                break;
             }
-        } else {
-            this.Continuar = false;
         }
+        this.Continuar = false;
     }
+    /*
+        public ejecutarNodo() {
+            if (this.i < this.nodos.length) {
+                let nodo = this.nodos[this.i];
+    
+                if (isNullOrUndefined(this.metodo)) {
+                    if (!(nodo instanceof Label) && !(nodo instanceof Metodo)) {
+                        if (nodo instanceof Call) {
+                            let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                            if (!isNullOrUndefined(salto)) {
+                                this.retorna.push(this.i);
+                                this.i = salto;
+                            }
+                        } else if (nodo instanceof End) {
+                            this.i = this.retorna.pop();
+                        } else if (nodo instanceof Read) {
+                            this.Bandera.leerEntrada = true;
+                            this.Continuar = false;
+                        } else if (!(nodo instanceof Salto) && !(nodo instanceof SaltoCond)) {
+                            nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                        } else {
+                            let salto = nodo.ejecutar(this.Entorno, this.Log, this.Errores);
+                            if (!isNullOrUndefined(salto)) {
+                                this.i = salto;
+                            }
+                        }
+                    } else {
+                        if (nodo instanceof Metodo) {
+                            this.metodo = nodo.id;
+                        }
+                    }
+                } else {
+                    if (nodo instanceof End) {
+                        this.metodo = null;
+                    }
+                }
+                this.i++;
+                if (this.Entorno.NullPointer) {
+                    this.Continuar = false;
+                    return;
+                }
+    
+                if (this.Continuar) {
+                    this.ejecutarNodo();
+                }
+            } else {
+                this.Continuar = false;
+            }
+        }*/
 
     public debugear(log: any, errores: any, entorno: Entorno, editor: any) {
 
@@ -296,7 +309,7 @@ export class AST {
     }
 
     untilBreakpoint() {
-        if (this.i < this.nodos.length) {
+        while (this.i < this.nodos.length) {
             let nodo = this.nodos[this.i];
 
             if (!isNullOrUndefined(this.Breakpoints[nodo.linea])) {
@@ -340,26 +353,25 @@ export class AST {
             }
             this.i++;
             if (this.Entorno.NullPointer) {
-                this.Continuar = false;
-                return;
+                break;
             }
 
-            if (this.Continuar) {
-                this.untilBreakpoint();
+            if (!this.Continuar) {
+                break;
             }
-        } else {
-
-            let nodo = this.nodos[this.i-1];
-            this.Editor.gotoLine(nodo.linea, 0, true);
-            this.Editor.setHighlightActiveLine(true);
-            this.Editor.focus();
-            this.Continuar = false;
         }
+
+        let nodo = this.nodos[this.i - 2];
+        this.Editor.gotoLine(nodo.linea, 0, true);
+        this.Editor.setHighlightActiveLine(true);
+        this.Editor.focus();
+        this.Continuar = false;
+
     }
 
     async ejecutarNodoDebug() {
 
-        if (this.i < this.nodos.length) {
+        while (this.i < this.nodos.length) {
             let nodo = this.nodos[this.i];
 
             if (isNullOrUndefined(this.metodo)) {
@@ -404,19 +416,19 @@ export class AST {
             }
             this.i++;
             if (this.Entorno.NullPointer) {
-                this.Continuar = false;
-                return;
+                break;
             }
 
-            if (this.Continuar) {
-                this.ejecutarNodoDebug();
+            if (!this.Continuar) {
+                break;
             }
-        } else {
-            let nodo = this.nodos[this.i-1];
-            this.Editor.gotoLine(nodo.linea, 0, true);
-            this.Editor.setHighlightActiveLine(true);
-            this.Editor.focus();
-            this.Continuar = false;
         }
+
+        let nodo = this.nodos[this.i - 2];
+        this.Editor.gotoLine(nodo.linea, 0, true);
+        this.Editor.setHighlightActiveLine(true);
+        this.Editor.focus();
+        this.Continuar = false;
+
     }
 }
