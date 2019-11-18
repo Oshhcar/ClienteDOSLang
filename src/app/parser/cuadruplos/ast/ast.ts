@@ -8,6 +8,7 @@ import { End } from './instruccion/end';
 import { Call } from './instruccion/call';
 import { Read } from './instruccion/read';
 import { BanderaInterface } from 'src/app/models/bandera.interface';
+import { Tipo } from './entorno/simbolo.interface';
 
 export class AST {
 
@@ -361,7 +362,7 @@ export class AST {
             }
         }
 
-        if(this.i >= this.nodos.length) {
+        if (this.i >= this.nodos.length) {
             let nodo = this.nodos[this.i - 2];
             this.Editor.gotoLine(nodo.linea, 0, true);
             this.Editor.setHighlightActiveLine(true);
@@ -425,7 +426,7 @@ export class AST {
             }
         }
 
-        if(this.i >= this.nodos.length){
+        if (this.i >= this.nodos.length) {
             let nodo = this.nodos[this.i - 2];
             this.Editor.gotoLine(nodo.linea, 0, true);
             this.Editor.setHighlightActiveLine(true);
@@ -433,5 +434,177 @@ export class AST {
             this.Continuar = false;
         }
 
+    }
+
+    public traducir(entorno: Entorno, errores: any): string {
+        let codigo: string;
+
+        let inicio;
+        inicio = ".model small\n";
+        inicio += "Pila SEGMENT STACK 'STACK'\n";
+        inicio += "DB   4e20h   DUP(?)\n";
+        inicio += "Pila ENDS\n"
+
+        codigo = ".code\n\n";
+        codigo += "mov  ax, @data\n";
+        codigo += "mov  ds, ax\n\n";
+
+        let bandera = false;
+
+        for (let i = 0; i < this.nodos.length; i++) {
+            let nodo = this.nodos[i];
+
+            if (nodo instanceof Metodo) {
+                if (!bandera) {
+                    bandera = true;
+                    codigo += "mov  ah, 4ch\n";
+                    codigo += "int  21h\n\n";
+                    codigo += "ret\n\n"
+                }
+            }
+
+            codigo += nodo.traducir(entorno, errores);
+        }
+
+        if (!bandera) {
+            codigo += "mov  ah, 4ch\n";
+            codigo += "int  21h\n\n";
+            codigo += "ret\n\n"
+        }
+
+        /**
+         * Código para imprimir
+        */
+
+        codigo += "print_char   proc\n";
+        codigo += "push  ax\n";
+        codigo += "mov  ah, 0Eh\n";
+        codigo += "int  10h\n";
+        codigo += "pop  ax\n";
+        codigo += "ret\n"
+        codigo += "print_char   endp\n\n";
+
+        codigo += "print_num    proc near\n";
+        codigo += "push  dx\n";
+        codigo += "push  ax\n";
+        codigo += "cmp  ax, 0\n";
+        codigo += "jnz  no_cero\n";
+        codigo += "mov  ax, 48\n";
+        codigo += "call print_char\n";
+        codigo += "jmp  salida\n";
+
+        codigo += "no_cero:\n";
+        codigo += "cmp  ax, 0\n";
+        codigo += "jns  positivo\n";
+        codigo += "neg  ax\n";
+        codigo += "push ax\n";
+        codigo += "mov  ax, 45\n";
+        codigo += "call print_char\n";
+        codigo += "pop  ax\n";
+        codigo += "positivo:\n";
+        codigo += "call print_num_uns\n";
+        codigo += "salida:\n";
+        codigo += "pop  ax\n";
+        codigo += "pop  dx\n";
+        codigo += "ret\n";
+        codigo += "print_num    endp\n\n";
+
+        codigo += "print_num_uns    proc near\n";
+        codigo += "push  ax\n";
+        codigo += "push  bx\n";
+        codigo += "push  cx\n";
+        codigo += "push  dx\n";
+        codigo += "mov  cx, 1\n";
+        codigo += "mov  bx, 10000\n";
+        codigo += "cmp  ax, 0\n";
+        codigo += "jz   print_cero\n";
+        codigo += "inicia_print:\n";
+        codigo += "cmp  bx, 0\n";
+        codigo += "jz   end_print\n";
+        codigo += "cmp  cx, 0\n";
+        codigo += "je   calc\n";
+        codigo += "cmp ax, bx\n";
+        codigo += "jb   skip\n";
+        codigo += "calc:\n";
+        codigo += "mov  cx, 0\n";
+        codigo += "mov  dx, 0\n";
+        codigo += "div  bx\n";
+        codigo += "add  al, 30h\n";
+        codigo += "call print_char\n";
+        codigo += "mov  ax, dx\n";
+        codigo += "skip:\n";
+        codigo += "push  ax\n";
+        codigo += "mov  dx, 0\n";
+        codigo += "mov  ax, bx\n";
+        codigo += "div  ten\n";
+        codigo += "mov  bx, ax\n";
+        codigo += "pop  ax\n";
+        codigo += "jmp  inicia_print\n";
+        codigo += "print_cero:\n";
+        codigo += "mov  ax, 48\n";
+        codigo += "call print_char\n";
+        codigo += "end_print:\n";
+        codigo += "pop  dx\n";
+        codigo += "pop  cx\n";
+        codigo += "pop  bx\n";
+        codigo += "pop  ax\n";
+        codigo += "ret\n";
+        codigo += "print_num_uns    endp\n\n";
+
+        codigo += "modulo_num   proc\n";
+        codigo += "cmp  ax, dx\n";
+        codigo += "je   equals\n";
+        codigo += "jl   sale\n";
+        codigo += "restar:\n";
+        codigo += "sub  ax, dx\n";
+        codigo += "cmp  ax, dx\n";
+        codigo += "jge  restar\n";
+        codigo += "jmp  sale\n";
+        codigo += "equals:\n";
+        codigo += "mov  ax, 0\n";
+        codigo += "sale:\n";
+        codigo += "ret\n";
+        codigo += "modulo_num   endp\n\n";
+
+        codigo += "dividir_num  proc\n";
+        codigo += "mov  cx, 0\n";
+        codigo += "cmp  ax, dx\n";
+        codigo += "je   iguales\n";
+        codigo += "jl   retorna\n";
+        codigo += "comparar:\n";
+        codigo += "inc  cx\n";
+        codigo += "sub  ax, dx\n";
+        codigo += "cmp  ax, dx\n";
+        codigo += "je   iguales\n";
+        codigo += "jl   retorna\n";
+        codigo += "jmp  comparar\n";
+        codigo += "iguales:\n";
+        codigo += "inc  cx\n";
+        codigo += "retorna:\n";
+        codigo += "ret\n";
+        codigo += "dividir_num  endp\n\n";
+
+        /**
+         * Segmento dato
+        */
+        let dato;
+        dato = ".data\n";
+        //codigo += "P         dw 0\n";
+        //codigo += "H         dw 0\n";
+        dato += "ten       dw  10\n";
+
+        for (let i = 0; i < entorno.Simbolos.length; i++) {
+            let sim = entorno.Simbolos[i];
+
+            if (sim.tipo == Tipo.DECIMAL || sim.tipo == Tipo.ENTERO) {
+                dato += sim.id + "    dw 0\n";
+            }
+        }
+
+        dato += "stack     dw 5000 DUP(-1)\n";
+        dato += "heap      dw 5000 DUP(-1)\n\n";
+
+        codigo = inicio + dato + codigo + "end\n";
+        return codigo;
     }
 }

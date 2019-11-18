@@ -18,5 +18,12 @@ export class Literal extends Expresion{
         return this.valor;
     }
 
+    traducir(e: Entorno, errores: any) {
+        if(this.tipo == Tipo.DECIMAL){
+            return Math.floor(Number(this.valor)).toString();
+        } else {
+            return this.valor.toString();
+        }
+    }
     
 }

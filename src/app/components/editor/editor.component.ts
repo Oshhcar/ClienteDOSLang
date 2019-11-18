@@ -41,6 +41,9 @@ export class EditorComponent implements OnInit {
   @ViewChild('consolaEditor', { static: true }) consolaEditorElmRef: ElementRef;
   private consolaEditor: ace.Ace.Editor;
 
+  @ViewChild('asmEditor', { static: true }) asmEditorElmRef: ElementRef;
+  private asmEditor: ace.Ace.Editor;
+
   constructor(private socket: SocketService) { }
 
   ngOnInit() {
@@ -103,7 +106,7 @@ export class EditorComponent implements OnInit {
     const editorOptionsConsola: Partial<ace.Ace.EditorOptions> = {
       highlightActiveLine: false,
       minLines: 15,
-      maxLines: 15,
+      maxLines: 20,
       fontSize: 15,
       readOnly: true
     };
@@ -112,6 +115,21 @@ export class EditorComponent implements OnInit {
     this.consolaEditor.setTheme('ace/theme/terminal');
     this.consolaEditor.getSession().setMode('ace/mode/text');
     this.consolaEditor.setShowFoldWidgets(true);
+
+
+    const elementAsm = this.asmEditorElmRef.nativeElement;
+    const editorOptionsAsm: Partial<ace.Ace.EditorOptions> = {
+      highlightActiveLine: false,
+      minLines: 15,
+      maxLines: 25,
+      fontSize: 15,
+    };
+
+    this.asmEditor = ace.edit(elementAsm, editorOptionsAsm);
+    this.asmEditor.setTheme('ace/theme/github');
+    this.asmEditor.getSession().setMode('ace/mode/text');
+    this.asmEditor.setShowFoldWidgets(true);
+
 
   }
 
@@ -181,7 +199,7 @@ export class EditorComponent implements OnInit {
 
     this.error2 = '';
     this.mensaje2 = '';
-    
+
     this.error3 = '';
     this.bandera.leerEntrada = false;
 
@@ -227,8 +245,8 @@ export class EditorComponent implements OnInit {
     //verificar que no esté vacío.
     //let ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
     this.AST = parserCuadruplos.parse(this.codeEditor3d.getValue());
-    
-    if (this.AST) { 
+
+    if (this.AST) {
       let entorno = new Entorno();
 
       this.P = { id: "p", valor: 0, tipo: Tipo.ENTERO };
@@ -370,55 +388,55 @@ export class EditorComponent implements OnInit {
             this.error3 = 'Se espera un Char, inténtelo nuevamente.';
           }
         } else if (tipo == 1) { //integer
-          if(!isNaN(Number(this.lectura))){
+          if (!isNaN(Number(this.lectura))) {
             valor = Number(this.lectura);
-            if(valor % 1 == 0){
+            if (valor % 1 == 0) {
               correcto = true;
             } else {
               this.error3 = 'Se espera un Integer, inténtelo nuevamente.';
             }
-          } else if(this.lectura.length == 1){
+          } else if (this.lectura.length == 1) {
             valor = this.lectura.charCodeAt(0);
             correcto = true;
           } else {
             this.error3 = 'Se espera un Integer, inténtelo nuevamente.';
           }
-        } else if(tipo == 2) { //real
-          if(!isNaN(Number(this.lectura))){
+        } else if (tipo == 2) { //real
+          if (!isNaN(Number(this.lectura))) {
             valor = Number(this.lectura);
             correcto = true;
-          } else if(this.lectura.length == 1){
+          } else if (this.lectura.length == 1) {
             valor = this.lectura.charCodeAt(0);
             correcto = true;
           } else {
             this.error3 = 'Se espera un Real, inténtelo nuevamente.';
           }
-        } else if(tipo == 3) { //cadena
+        } else if (tipo == 3) { //cadena
           valor = this.H.valor;
 
-          for(let i = 0; i<this.lectura.length; i ++){
+          for (let i = 0; i < this.lectura.length; i++) {
             this.heap.valor[this.H.valor] = this.lectura.charCodeAt(i);
-            this.H.valor = this.H.valor+1;
+            this.H.valor = this.H.valor + 1;
           }
           this.heap.valor[this.H.valor] = 0;
-          this.H.valor = this.H.valor+1;
+          this.H.valor = this.H.valor + 1;
           correcto = true;
-        } else if(tipo == 4){ //boolean
-          if(!isNaN(Number(this.lectura))){
-            if(Number(this.lectura) == 1){
+        } else if (tipo == 4) { //boolean
+          if (!isNaN(Number(this.lectura))) {
+            if (Number(this.lectura) == 1) {
               valor = 1;
               correcto = true;
-            } else if(Number(this.lectura) == 0){
+            } else if (Number(this.lectura) == 0) {
               valor = 0;
               correcto = true;
             } else {
               this.error3 = 'Se espera un Boolean, inténtelo nuevamente.';
             }
           } else {
-            if(this.lectura.toLowerCase() == 'true'){
+            if (this.lectura.toLowerCase() == 'true') {
               valor = 1;
               correcto = true;
-            } else if(this.lectura.toLowerCase() == 'false'){
+            } else if (this.lectura.toLowerCase() == 'false') {
               valor = 0;
               correcto = true;
             } else {
@@ -455,6 +473,42 @@ export class EditorComponent implements OnInit {
     } else {
       this.error3 = 'Se debe ingresar un valor.';
     }
+  }
+
+  onTraducir() {
+    this.error2 = '';
+    this.mensaje2 = '';
+
+    let contenido = this.codeEditor3d.getValue();
+
+    if (!isNullOrUndefined(contenido)) {
+      if (contenido.length > 0) {
+        this.errorEjecucion = [];
+
+        let ast : AST;
+        ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
+
+        if (ast) {
+          let entorno = new Entorno();
+
+          let p = { id: "p", valor: 0, tipo: Tipo.ENTERO };
+          let h = { id: "h", valor: 0, tipo: Tipo.ENTERO };
+          let stack = { id: "stack", valor: [], tipo: Tipo.ARREGLO };
+          let heap = { id: "heap", valor: [], tipo: Tipo.ARREGLO };
+
+          entorno.addSimbolo(p);
+          entorno.addSimbolo(h);
+          entorno.addSimbolo(stack);
+          entorno.addSimbolo(heap);
+          entorno.addSimbolo({id: "tmp", valor:0, tipo: Tipo.ENTERO});
+          entorno.addSimbolo({id: "t0", valor:0, tipo: Tipo.ENTERO});
+
+          this.asmEditor.setValue(ast.traducir(entorno, this.errorEjecucion));
+          this.asmEditor.navigateFileEnd();
+        }
+      }
+    }
+
   }
 
 }

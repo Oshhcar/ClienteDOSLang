@@ -15,4 +15,9 @@ export class Read extends Instruccion {
         return null;
     }
 
+    traducir(e: Entorno, errores: any){
+        let codigo = "";
+
+        return codigo;
+    }
 }

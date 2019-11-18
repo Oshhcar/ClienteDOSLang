@@ -26,7 +26,7 @@ export class Asignacion extends Instruccion {
             if (this.op == Op.IGUAL) {
                 if (isNullOrUndefined(this.exp2)) {
                     if (this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL) {
-                        let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
+                        let sim = this.temp ? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                         if (isNullOrUndefined(sim)) {
                             sim = {
                                 id: this.target.toLowerCase(),
@@ -72,7 +72,7 @@ export class Asignacion extends Instruccion {
 
                             if (sim.tipo == Tipo.ARREGLO) {
                                 if (this.exp1.Tipo == Tipo.ENTERO) {
-                                    if(this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL){
+                                    if (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL) {
                                         sim.valor[Number(valExp1)] = Number(valExp2);
                                     } else {
                                         errores.push({
@@ -119,17 +119,17 @@ export class Asignacion extends Instruccion {
                                         log.gotoPageDown();
                                         e.NullPointer = true;
                                     } else {
-                                        let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
-                                        
-                                        let valor = valExp1[Number(valExp2)];
-                                        let tipo : Tipo;
+                                        let sim = this.temp ? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
 
-                                        if(valor%1 == 0){
+                                        let valor = valExp1[Number(valExp2)];
+                                        let tipo: Tipo;
+
+                                        if (valor % 1 == 0) {
                                             tipo = Tipo.ENTERO;
                                         } else {
                                             tipo = Tipo.DECIMAL;
                                         }
-                                        
+
                                         if (isNullOrUndefined(sim)) {
                                             sim = {
                                                 id: this.target.toLowerCase(),
@@ -173,17 +173,17 @@ export class Asignacion extends Instruccion {
                 let valExp2 = this.exp2.getValor(e, log, errores);
 
                 if (!isNullOrUndefined(valExp2)) {
-                    if ((this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL ) && (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL)) {
-                        
+                    if ((this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL) && (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL)) {
+
                         let tipoDominante;
 
-                        if(this.exp1.Tipo == Tipo.DECIMAL || this.exp2.Tipo == Tipo.DECIMAL){
+                        if (this.exp1.Tipo == Tipo.DECIMAL || this.exp2.Tipo == Tipo.DECIMAL) {
                             tipoDominante = Tipo.DECIMAL;
                         } else {
                             tipoDominante = Tipo.ENTERO;
                         }
 
-                        let sim = this.temp? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
+                        let sim = this.temp ? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
                         if (isNullOrUndefined(sim)) {
                             sim = {
                                 id: this.target.toLowerCase(),
@@ -193,25 +193,25 @@ export class Asignacion extends Instruccion {
                             e.addSimbolo(sim);
                         }
                         if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
-                            switch(this.op){
-                                case Op.SUMA:{
+                            switch (this.op) {
+                                case Op.SUMA: {
                                     sim.valor = Number(valExp1) + Number(valExp2);
                                     sim.tipo = tipoDominante;
                                     break;
                                 }
-                                case Op.RESTA:{
+                                case Op.RESTA: {
                                     sim.valor = Number(valExp1) - Number(valExp2);
                                     sim.tipo = tipoDominante;
                                     break;
                                 }
-                                case Op.MULTIPLICACION:{
+                                case Op.MULTIPLICACION: {
                                     sim.valor = Number(valExp1) * Number(valExp2);
                                     sim.tipo = tipoDominante;
                                     break;
                                 }
-                                case Op.DIVISION:{
-                                    if(Number(valExp2) != 0){
-                                        if(tipoDominante == Tipo.DECIMAL){
+                                case Op.DIVISION: {
+                                    if (Number(valExp2) != 0) {
+                                        if (tipoDominante == Tipo.DECIMAL) {
                                             sim.valor = (Number(valExp1) / Number(valExp2));
                                         } else {
                                             sim.valor = Math.floor(Number(valExp1) / Number(valExp2));
@@ -236,11 +236,11 @@ export class Asignacion extends Instruccion {
                                     }
                                     break;
                                 }
-                                case Op.MODULO:{
-                                    if(tipoDominante == Tipo.DECIMAL){
+                                case Op.MODULO: {
+                                    if (tipoDominante == Tipo.DECIMAL) {
                                         sim.valor = Number(valExp1) % Number(valExp2);
                                     } else {
-                                        sim.valor =Math.floor(Number(valExp1) % Number(valExp2));
+                                        sim.valor = Math.floor(Number(valExp1) % Number(valExp2));
                                     }
                                     sim.tipo = tipoDominante;
                                     break;
@@ -267,6 +267,235 @@ export class Asignacion extends Instruccion {
         }
 
         return null;
+    }
+
+    traducir(e: Entorno, errores: any) {
+        let codigo = "";
+        let valExp1 = this.exp1.traducir(e, errores);
+
+        if (!isNullOrUndefined(valExp1)) {
+            if (this.op == Op.IGUAL) {
+                if (isNullOrUndefined(this.exp2)) {
+                    if (this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL) {
+                        let sim = this.temp ? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
+                        if (isNullOrUndefined(sim)) {
+                            sim = {
+                                id: this.target.toLowerCase(),
+                                valor: null,
+                                tipo: this.exp1.Tipo
+                            }
+                            e.addSimbolo(sim);
+                        }
+                        if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
+                            codigo += "mov  ax, " + valExp1 + "\n";
+                            codigo += "mov  " + sim.id + ", ax\n";
+                        } else {
+                            errores.push({
+                                valor: 'Semántico',
+                                descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '". ASM',
+                                linea: this.linea,
+                                columna: this.columna
+                            });
+                        }
+                    } else {
+                        errores.push({
+                            valor: 'Semántico',
+                            descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '". ASM',
+                            linea: this.linea,
+                            columna: this.columna
+                        });
+                    }
+                } else {
+                    /* PILA O STACK */
+                    let valExp2 = this.exp2.traducir(e, errores);
+                    if (!isNullOrUndefined(valExp2)) {
+                        if (this.target.toLowerCase() === "stack" || this.target.toLowerCase() === "heap") {
+
+                            let sim = e.getIdentificador(this.target.toLowerCase());
+                            if (isNullOrUndefined(sim)) {
+                                sim = {
+                                    id: this.target.toLowerCase(),
+                                    valor: [],
+                                    tipo: Tipo.ARREGLO
+                                }
+                                e.addSimbolo(sim);
+                            }
+
+                            if (sim.tipo == Tipo.ARREGLO) {
+                                if (this.exp1.Tipo == Tipo.ENTERO) {
+                                    if (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL) {
+                                        codigo += "mov  ax, " + valExp1 + "\n";
+                                        codigo += "mov  tmp, 2\n"
+                                        codigo += "mul  tmp\n";
+                                        codigo += "mov  bx, ax\n";
+                                        codigo += "mov  ax, " + valExp2 + "\n";
+
+                                        codigo += "mov  " + sim.id + "[bx], ax\n";
+                                        //sim.valor[Number(valExp1)] = Number(valExp2);
+                                    } else {
+                                        errores.push({
+                                            valor: 'Semántico',
+                                            descripcion: 'Valor debe ser entero o decimal. ASM',
+                                            linea: this.linea,
+                                            columna: this.columna
+                                        });
+                                    }
+                                } else {
+                                    errores.push({
+                                        valor: 'Semántico',
+                                        descripcion: 'Posición del arreglo debe ser entero. ASM',
+                                        linea: this.linea,
+                                        columna: this.columna
+                                    });
+                                }
+                            } else {
+                                errores.push({
+                                    valor: 'Semántico',
+                                    descripcion: 'Variable "' + this.target.toLowerCase() + '" no es arreglo. ASM',
+                                    linea: this.linea,
+                                    columna: this.columna
+                                });
+                            }
+
+                        } else {
+                            if (this.exp1.Tipo == Tipo.ARREGLO) {
+                                if (this.exp2.Tipo == Tipo.ENTERO) {
+                                    let sim = this.temp ? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
+
+                                    if (isNullOrUndefined(sim)) {
+                                        sim = {
+                                            id: this.target.toLowerCase(),
+                                            valor: null,
+                                            tipo: Tipo.ENTERO
+                                        }
+                                        e.addSimbolo(sim);
+                                    }
+                                    if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
+                                        
+                                        codigo += "mov  ax, " + valExp2 + "\n";
+                                        codigo += "mov  tmp, 2\n";
+                                        codigo += "mul  tmp\n";
+                                        codigo += "mov  bx, ax\n";
+                                        codigo += "mov  ax, " + valExp1 + "[bx]\n";
+                                        codigo += "mov  " + sim.id + ", ax\n";
+                                        //sim.valor = valor;
+                                        //sim.tipo = tipo;
+                                    } else {
+                                        errores.push({
+                                            valor: 'Semántico',
+                                            descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '" ASM.',
+                                            linea: this.linea,
+                                            columna: this.columna
+                                        });
+                                    }
+
+                                } else {
+                                    errores.push({
+                                        valor: 'Semántico',
+                                        descripcion: 'Posición debe ser número entero. ASM',
+                                        linea: this.linea,
+                                        columna: this.columna
+                                    });
+                                }
+                            } else {
+                                errores.push({
+                                    valor: 'Semántico',
+                                    descripcion: 'Variable de acceso no es arreglo. ASM',
+                                    linea: this.linea,
+                                    columna: this.columna
+                                });
+                            }
+                        }
+                    }
+                }
+            } else {
+                let valExp2 = this.exp2.traducir(e, errores);
+
+                if (!isNullOrUndefined(valExp2)) {
+                    if ((this.exp1.Tipo == Tipo.ENTERO || this.exp1.Tipo == Tipo.DECIMAL) && (this.exp2.Tipo == Tipo.ENTERO || this.exp2.Tipo == Tipo.DECIMAL)) {
+
+                        let tipoDominante;
+
+                        if (this.exp1.Tipo == Tipo.DECIMAL || this.exp2.Tipo == Tipo.DECIMAL) {
+                            tipoDominante = Tipo.DECIMAL;
+                        } else {
+                            tipoDominante = Tipo.ENTERO;
+                        }
+
+                        let sim = this.temp ? e.getTemporal(this.target.toLowerCase()) : e.getIdentificador(this.target.toLowerCase());
+                        if (isNullOrUndefined(sim)) {
+                            sim = {
+                                id: this.target.toLowerCase(),
+                                valor: null,
+                                tipo: tipoDominante
+                            }
+                            e.addSimbolo(sim);
+                        }
+                        if (sim.tipo == Tipo.ENTERO || sim.tipo == Tipo.DECIMAL) {
+                            switch (this.op) {
+                                case Op.SUMA: {
+                                    //sim.valor = Number(valExp1) + Number(valExp2);
+                                    codigo += "mov  ax, " + valExp1 + "\n";
+                                    codigo += "add  ax, " + valExp2 + "\n";
+                                    codigo += "mov  " + sim.id + ", ax\n";
+                                    sim.tipo = tipoDominante;
+                                    break;
+                                }
+                                case Op.RESTA: {
+                                    //sim.valor = Number(valExp1) - Number(valExp2);
+                                    codigo += "mov  ax, " + valExp1 + "\n";
+                                    codigo += "sub  ax, " + valExp2 + "\n";
+                                    codigo += "mov  " + sim.id + ", ax\n";
+                                    sim.tipo = tipoDominante;
+                                    break;
+                                }
+                                case Op.MULTIPLICACION: {
+                                    //sim.valor = Number(valExp1) * Number(valExp2);
+                                    codigo += "mov  ax, " + valExp1 + "\n";
+                                    codigo += "mov  dx, " + valExp2 + "\n";
+                                    codigo += "mul  dx\n";
+                                    codigo += "mov  " + sim.id + ", ax\n";
+                                    sim.tipo = tipoDominante;
+                                    break;
+                                }
+                                case Op.DIVISION: {
+                                    codigo += "mov  ax, " + valExp1 + "\n";
+                                    codigo += "mov  dx, " + valExp2 + "\n";
+                                    codigo += "call  dividir_num\n";
+                                    codigo += "mov  " + sim.id + ", cx\n";
+                                    sim.tipo = tipoDominante;
+                                    break;
+                                }
+                                case Op.MODULO: {
+                                    codigo += "mov  ax, " + valExp1 + "\n";
+                                    codigo += "mov  dx, " + valExp2 + "\n";
+                                    codigo += "call  modulo_num\n";
+                                    codigo += "mov  " + sim.id + ", ax\n";
+                                    sim.tipo = tipoDominante;
+                                    break;
+                                }
+                            }
+                        } else {
+                            errores.push({
+                                valor: 'Semántico',
+                                descripcion: 'No se puede asignar el valor a "' + this.target.toUpperCase() + '". ASM',
+                                linea: this.linea,
+                                columna: this.columna
+                            });
+                        }
+                    } else {
+                        errores.push({
+                            valor: 'Semántico',
+                            descripcion: 'No se pudo realizar la operaciópn aritmética. ASM',
+                            linea: this.linea,
+                            columna: this.columna
+                        });
+                    }
+                }
+            }
+        }
+
+        return codigo;
     }
 }
 

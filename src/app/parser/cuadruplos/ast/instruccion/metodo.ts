@@ -11,12 +11,12 @@ export class Metodo extends Instruccion {
         public id: String,
         public linea: number,
         public columna: number
-    ){
+    ) {
         super(linea, columna);
     }
 
     ejecutar(e: Entorno, log: any, errores: any) {
-        if(!e.getMetodo(this.id.toLowerCase())){
+        if (!e.getMetodo(this.id.toLowerCase())) {
             e.addSimbolo({
                 id: this.id.toLowerCase(),
                 valor: this.i,
@@ -34,5 +34,8 @@ export class Metodo extends Instruccion {
         return null;
     }
 
-    
+    traducir(e: Entorno, errores: any) {
+        return this.id.toLowerCase() + "       PROC\n";
+    }
+
 }

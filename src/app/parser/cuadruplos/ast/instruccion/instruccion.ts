@@ -11,4 +11,6 @@ export abstract class Instruccion extends NodoAST{
      }
 
     abstract ejecutar(e: Entorno, log: any, errores: any) : any;
+
+    abstract traducir(e: Entorno, errores: any): string;
 }

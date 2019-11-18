@@ -2,7 +2,7 @@ import { Instruccion } from './instruccion';
 import { Entorno } from '../entorno/entorno';
 import { isNullOrUndefined } from 'util';
 
-export class Salto extends Instruccion{
+export class Salto extends Instruccion {
 
     constructor(
         public label: String,
@@ -14,7 +14,7 @@ export class Salto extends Instruccion{
 
     ejecutar(e: Entorno, log: any, errores: any) {
         let sim = e.getLabel(this.label.toUpperCase());
-        if(!isNullOrUndefined(sim)){
+        if (!isNullOrUndefined(sim)) {
             return sim.valor;
         }
 
@@ -27,4 +27,7 @@ export class Salto extends Instruccion{
         return null;
     }
 
+    traducir(e: Entorno, errores: any) {
+        return "jmp  " + this.label.toUpperCase() + "\n";
+    }
 }

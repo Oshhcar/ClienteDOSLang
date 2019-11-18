@@ -17,5 +17,8 @@ export class End extends Instruccion {
         return this.id;
     }
 
+    traducir(e: Entorno, errores: any){
+        return "RET\n" + this.id.toLowerCase() + "    ENDP\n\n";
+    }
     
 }

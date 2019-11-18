@@ -14,4 +14,6 @@ export abstract class Expresion extends NodoAST{
      }
 
     abstract getValor(e: Entorno, log: any, errores: any) : any;
+
+    abstract traducir(e: Entorno, errores: any) : string;
 }

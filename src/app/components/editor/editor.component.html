@@ -13,24 +13,34 @@
     <div class="alert alert-success" *ngIf="mensaje2">{{mensaje2}}</div>
 
     <div class="row">
-        <div class="col-7">
-            <button class="btn btn-dark" (click)="onEjecutar()">Ejecutar</button>
+        <div class="col-8">
+            <button class="btn btn-dark " (click)="onEjecutar()">Ejecutar</button>
             &nbsp;
-            <button class="btn btn-dark" (click)="onDepurar()">Depurar</button>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-outline-warning active" (click)="onDepurar()">
+                    <input type="radio" name="options" id="depurar" autocomplete="off" checked> Depurar
+                </label>
+                <label class="btn btn-outline-danger" (click)="onPausa()">
+                    <input type="radio" name="options" id="pausa" autocomplete="off"> Pausa
+                </label>
+                <label class="btn btn-outline-success" (click)="onContinuar()">
+                    <input type="radio" name="options" id="continuar" autocomplete="off"> Continuar
+                </label>
+                <label class="btn btn-outline-info" (click)="onSiguiente()">
+                    <input type="radio" name="options" id="siguiente" autocomplete="off"> Siguiente
+                </label>
+                <label class="btn btn-outline-primary" (click)="onSiguienteBreakpoint()">
+                    <input type="radio" name="options" id="breakpoint" autocomplete="off"> Saltar Breakpoint
+                </label>
+            </div>
             &nbsp;
-            <button class="btn btn-dark" (click)="onPausa()">Pausa</button>
-            &nbsp;
-            <button class="btn btn-dark" (click)="onContinuar()">Continuar</button>
-            &nbsp;
-            <button class="btn btn-dark" (click)="onSiguiente()">Siguiente</button>
-            &nbsp;
-            <button class="btn btn-dark" (click)="onSiguienteBreakpoint()">Saltar Breakpoint</button>
+            <button class="btn btn-outline-dark " (click)="onTraducir()">Assembler</button>
         </div>
         <div class="col-2">
             <input type="range" class="custom-range" (click)="onRango()" min="1" max="6" id="rango"
                 [(ngModel)]="Tiempo">
         </div>
-        <div class="col-3">
+        <div class="col-2">
 
         </div>
     </div>
@@ -55,6 +65,11 @@
                 <a class="nav-link" id="{{file.name}}heap-tab" data-toggle="tab" href="#{{file.name}}heap" role="tab"
                     attr.aria-controls="{{file.name}}heap" aria-selected="false">Estructuras</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="{{file.name}}asm-tab" data-toggle="tab" href="#{{file.name}}asm" role="tab"
+                    attr.aria-controls="{{file.name}}asm" aria-selected="false">Assembler</a>
+            </li>
+
 
             <ng-template ngFor let-reporte [ngForOf]="reportes">
                 <li class="nav-item">
@@ -224,6 +239,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="tab-pane fade" id="{{file.name}}asm" role="tabpanel"
+                attr.aria-labelledby="{{file.name}}asm-tab">
+                <div class="code-editor" #asmEditor></div>
             </div>
 
             <div *ngFor="let reporte of reportes" class="tab-pane fade"

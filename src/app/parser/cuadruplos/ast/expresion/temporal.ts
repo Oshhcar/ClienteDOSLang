@@ -27,4 +27,20 @@ export class Temporal extends Expresion{
         return null;
     }
     
+    traducir(e: Entorno, errores: any) {
+        let s = e.getTemporal(this.id.toLowerCase()); 
+        if(s){
+            this.Tipo = s.tipo;
+            return this.id.toLowerCase();
+        } else {
+            errores.push({
+                valor: 'Semántico',
+                descripcion: 'Temporal "' + this.id.toLowerCase() + '" no definido. ASM',
+                linea: this.linea,
+                columna: this.columna
+            });
+        }
+
+        return null;
+    }
 }

@@ -31,4 +31,8 @@ export class Call extends Instruccion {
         return null;
     }
 
+    traducir(e: Entorno, errores: any){
+        return "call    " +  this.id.toLowerCase() + "\n";
+    }
+
 }
