@@ -16,8 +16,6 @@ export class Read extends Instruccion {
     }
 
     traducir(e: Entorno, errores: any){
-        let codigo = "";
-
-        return codigo;
+        return "call   read_num\n";
     }
 }

@@ -551,6 +551,155 @@ export class AST {
         codigo += "ret\n";
         codigo += "print_num_uns    endp\n\n";
 
+        codigo += "scan_num     proc\n";
+        codigo += "push  dx\n";
+        codigo += "push  ax\n";
+        codigo += "push  si\n";
+        codigo += "mov  cx, 0\n";
+        codigo += "mov  make_minus, 0\n";
+        codigo += "next_digit:\n";
+        codigo += "mov  ah, 00h\n";
+        codigo += "int  16h\n";
+        codigo += "mov  ah, 0Eh\n";
+        codigo += "int  10h\n";
+        codigo += "cmp  al, '-'\n";
+        codigo += "je   set_minus\n";
+        codigo += "cmp  al, 0Dh\n";
+        codigo += "jne  not_cr\n";
+        codigo += "jmp  stop_input\n";
+        codigo += "not_cr:\n";
+        codigo += "cmp  al, 8\n";
+        codigo += "jne  backspace_checked\n";
+        codigo += "mov  dx, 0\n";
+        codigo += "mov  ax, cx\n";
+        codigo += "div  ten\n";
+        codigo += "mov  cx, ax\n";
+        codigo += "mov  ax, 32\n";
+        codigo += "call print_char\n";
+        codigo += "mov  ax, 8\n";
+        codigo += "call print_char\n";
+        codigo += "jmp  next_digit\n";
+        codigo += "backspace_checked:\n";
+        codigo += "cmp  al, '0'\n";
+        codigo += "jae  ok_AE_0\n";
+        codigo += "jmp  remove_not_digit\n";
+        codigo += "ok_AE_0:\n";
+        codigo += "cmp  al, '9'\n";
+        codigo += "jbe  ok_digit\n";
+        codigo += "remove_not_digit:\n";
+        codigo += "mov  ax, 8\n";
+        codigo += "call  print_char\n";
+        codigo += "mov  ax, 32\n";
+        codigo += "call print_char\n";
+        codigo += "mov  ax, 8\n";
+        codigo += "call  print_char\n";
+        codigo += "jmp  next_digit\n";
+        codigo += "ok_digit:\n";
+        codigo += "push  ax\n";
+        codigo += "mov  ax, cx\n";
+        codigo += "mul  ten\n";
+        codigo += "mov  cx, ax\n";
+        codigo += "pop  ax\n";
+        codigo += "cmp  dx, 0\n";
+        codigo += "jne  too_big\n";
+        codigo += "sub  al, 30h\n";
+        codigo += "mov  ah, 0\n";
+        codigo += "mov  dx, cx\n";
+        codigo += "add  cx, ax\n";
+        codigo += "jc   too_big2\n";
+        codigo += "jmp  next_digit\n";
+        codigo += "set_minus:\n";
+        codigo += "mov  make_minus, 1\n";
+        codigo += "jmp  next_digit\n";
+        codigo += "too_big2:\n";
+        codigo += "mov  cx, dx\n";
+        codigo += "mov  dx, 0\n";
+        codigo += "too_big:\n";
+        codigo += "mov  ax, cx\n";
+        codigo += "div  ten\n";
+        codigo += "mov  cx, ax\n";
+        codigo += "mov  ax, 8\n";
+        codigo += "call  print_char\n";
+        codigo += "mov  ax, 32\n";
+        codigo += "call  print_char\n";
+        codigo += "mov  ax, 8\n";
+        codigo += "call  print_char\n";
+        codigo += "jmp  next_digit\n";
+        codigo += "stop_input:\n";
+        codigo += "cmp  make_minus, 0\n";
+        codigo += "je   not_minus\n";
+        codigo += "neg  cx\n";
+        codigo += "not_minus:\n";
+        codigo += "mov  ax, 10\n";
+        codigo += "call  print_char\n";
+        codigo += "mov  ax, 13\n";
+        codigo += "call  print_char\n";
+        codigo += "pop  si\n";
+        codigo += "pop  ax\n";
+        codigo += "pop  dx\n";
+        codigo += "ret\n";
+        codigo += "scan_num     endp\n\n";
+
+        codigo += "read_num     proc\n";
+        codigo += "mov  ax, p\n";
+        codigo += "add  ax, 3\n"; //Posicion del tipo
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n"; 
+        codigo += "mov  bx, ax\n";  //indice real tipo
+        codigo += "mov  ax, stack[bx]\n"; //valor tipo
+        codigo += "cmp  ax, 1\n";
+        codigo += "jne  salida_read\n";
+
+        codigo += "call  scan_num\n";
+
+        codigo += "mov  ax, p\n";
+        codigo += "add  ax, 2\n";
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n";
+        codigo += "mov  bx, ax\n"; //indice del valor
+        codigo += "mov  stack[bx], cx\n";
+
+        codigo += "mov  ax, p\n";
+        codigo += "add  ax, 4\n"; //struct o heap
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n";
+        codigo += "mov  bx, ax\n";
+        codigo += "mov  ax, stack[bx]\n";
+        codigo += "cmp  ax, 0\n";
+        codigo += "jne  asigna_heap\n";
+
+        codigo += "mov  ax, p\n";
+        codigo += "add  ax, 1\n"; //direccion valor
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n";
+        codigo += "mov  bx, ax\n";
+        codigo += "mov  ax, stack[bx]\n";
+
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n";
+        codigo += "mov  bx, ax\n";
+        codigo += "mov  stack[bx], cx\n";
+
+        codigo += "jmp  salida_read\n";
+
+        codigo += "asigna_heap:\n";
+        codigo += "mov  ax, p\n";
+        codigo += "add  ax, 1\n"; //direccion valor
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n";
+        codigo += "mov  bx, ax\n";
+        codigo += "mov  ax, stack[bx]\n";
+
+        codigo += "mov  tmp, 2\n";
+        codigo += "mul  tmp\n";
+        codigo += "mov  bx, ax\n";
+        codigo += "mov  heap[bx], cx\n";
+
+
+        codigo += "salida_read:\n";
+        codigo += "ret\n";
+        codigo += "read_num     endp\n\n";
+
         codigo += "modulo_num   proc\n";
         codigo += "cmp  ax, dx\n";
         codigo += "je   equals\n";
@@ -591,13 +740,14 @@ export class AST {
         dato = ".data\n";
         //codigo += "P         dw 0\n";
         //codigo += "H         dw 0\n";
-        dato += "ten       dw  10\n";
+        dato += "ten            dw  10\n";
+        dato += "make_minus     db  ?\n";
 
         for (let i = 0; i < entorno.Simbolos.length; i++) {
             let sim = entorno.Simbolos[i];
 
             if (sim.tipo == Tipo.DECIMAL || sim.tipo == Tipo.ENTERO) {
-                dato += sim.id + "    dw 0\n";
+                dato += sim.id + "      dw 0\n";
             }
         }
 
