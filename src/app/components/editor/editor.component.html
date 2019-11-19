@@ -35,6 +35,8 @@
             </div>
             &nbsp;
             <button class="btn btn-outline-dark " (click)="onTraducir()">Assembler</button>
+            &nbsp;
+            <button class="btn btn-outline-dark " (click)="onOptimizar()">Optimizar</button>
         </div>
         <div class="col-2">
             <input type="range" class="custom-range" (click)="onRango()" min="1" max="6" id="rango"
@@ -69,7 +71,14 @@
                 <a class="nav-link" id="{{file.name}}asm-tab" data-toggle="tab" href="#{{file.name}}asm" role="tab"
                     attr.aria-controls="{{file.name}}asm" aria-selected="false">Assembler</a>
             </li>
-
+            <li class="nav-item">
+                <a class="nav-link" id="{{file.name}}optimizado-tab" data-toggle="tab" href="#{{file.name}}optimizado"
+                    role="tab" attr.aria-controls="{{file.name}}optimizado" aria-selected="false">Optimizado</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="{{file.name}}repoptimizado-tab" data-toggle="tab" href="#{{file.name}}repoptimizado"
+                    role="tab" attr.aria-controls="{{file.name}}repoptimizado" aria-selected="false">Reporte Optimizado</a>
+            </li>
 
             <ng-template ngFor let-reporte [ngForOf]="reportes">
                 <li class="nav-item">
@@ -244,6 +253,35 @@
                 attr.aria-labelledby="{{file.name}}asm-tab">
                 <div class="code-editor" #asmEditor></div>
             </div>
+            <div class="tab-pane fade" id="{{file.name}}optimizado" role="tabpanel"
+                attr.aria-labelledby="{{file.name}}optimizado-tab">
+                <div class="code-editor" #codeEditorOptimizado></div>
+            </div>
+            <div class="tab-pane fade" id="{{file.name}}repoptimizado" role="tabpanel"
+            attr.aria-labelledby="{{file.name}}repoptimizado-tab">
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Expresión</th>
+                            <th>Resultado</th>
+                            <th>Regla aplicada</th>
+                            <th>Fila</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let o of optimizado; let i = index">
+                            <td>{{i+1}}</td>
+                            <td>{{o.expresion}}</td>
+                            <td>{{o.resultado}}</td>
+                            <td>{{o.regla}}</td>
+                            <td>{{o.fila}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
             <div *ngFor="let reporte of reportes" class="tab-pane fade"
                 id="{{file.name}}reporte_{{reportes.indexOf(reporte)}}" role="tabpanel"

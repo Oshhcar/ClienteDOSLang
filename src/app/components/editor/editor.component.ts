@@ -15,6 +15,8 @@ import { Simbolo, Tipo } from 'src/app/parser/cuadruplos/ast/entorno/simbolo.int
 import { AST } from 'src/app/parser/cuadruplos/ast/ast';
 import { SimboloInterface } from 'src/app/models/simbolo.interface';
 import { BanderaInterface } from 'src/app/models/bandera.interface';
+import { Optimizado } from 'src/app/models/optimizado.interface';
+import { Optimizador } from 'src/app/parser/cuadruplos/optimizador';
 
 const THEME = 'ace/theme/github';
 const LANG = 'ace/mode/java';
@@ -43,6 +45,10 @@ export class EditorComponent implements OnInit {
 
   @ViewChild('asmEditor', { static: true }) asmEditorElmRef: ElementRef;
   private asmEditor: ace.Ace.Editor;
+
+  @ViewChild('codeEditorOptimizado', { static: true }) codeEditorElmRefOptimizado: ElementRef;
+  private codeEditorOptimizado: ace.Ace.Editor;
+
 
   constructor(private socket: SocketService) { }
 
@@ -131,6 +137,19 @@ export class EditorComponent implements OnInit {
     this.asmEditor.setShowFoldWidgets(true);
 
 
+    const elementOptimizado = this.codeEditorElmRefOptimizado.nativeElement;
+    const editorOptionsOptimizado: Partial<ace.Ace.EditorOptions> = {
+      highlightActiveLine: true,
+      minLines: 15,
+      maxLines: 25,
+      fontSize: 15
+    };
+
+    this.codeEditorOptimizado = ace.edit(elementOptimizado, editorOptionsOptimizado);
+    this.codeEditorOptimizado.setTheme(THEME);
+    this.codeEditorOptimizado.getSession().setMode(LANG);
+    this.codeEditorOptimizado.setShowFoldWidgets(true); // for the scope fold feature
+
   }
 
 
@@ -163,6 +182,8 @@ export class EditorComponent implements OnInit {
   AST: AST;
 
   Tiempo: number = 3;
+
+  optimizado: Optimizado[] = [];
 
   onGuardar() {
     //console.log(this.codeEditor.getValue());
@@ -200,29 +221,32 @@ export class EditorComponent implements OnInit {
     this.error2 = '';
     this.mensaje2 = '';
 
-    this.error3 = '';
-    this.bandera.leerEntrada = false;
+    if (!isNullOrUndefined(this.codeEditor.getValue())) {
+      if (this.codeEditor.getValue().length > 0) {
+        this.error3 = '';
+        this.bandera.leerEntrada = false;
 
-    this.consolaEditor.setValue('');
-    this.consolaEditor.gotoLine(1, 0, false);
+        this.consolaEditor.setValue('');
+        this.consolaEditor.gotoLine(1, 0, false);
 
-    this.socket.traducir(this.files)
-      .subscribe(
-        (contenido: ContenidoInterface) => {
-          this.contenido = contenido;
-          this.codeEditor3d.setValue(this.contenido.content.toString());
-          this.codeEditor3d.navigateLineEnd();
+        this.socket.traducir(this.files)
+          .subscribe(
+            (contenido: ContenidoInterface) => {
+              this.contenido = contenido;
+              this.codeEditor3d.setValue(this.contenido.content.toString());
+              this.codeEditor3d.navigateLineEnd();
 
-          this.errorEditor = contenido.errors;
-          this.simbolos = contenido.table;
-        },
-        (error) => {
-          this.error = "Error de conexión, inténtelo nuevamente.";
-          console.log(error);
-        }
-      );
-    //console.log("archivos->"+this.files);
-
+              this.errorEditor = contenido.errors;
+              this.simbolos = contenido.table;
+            },
+            (error) => {
+              this.error = "Error de conexión, inténtelo nuevamente.";
+              console.log(error);
+            }
+          );
+        //console.log("archivos->"+this.files);
+      }
+    }
     this.file.main = false;
   }
 
@@ -236,36 +260,39 @@ export class EditorComponent implements OnInit {
     this.error2 = '';
     this.mensaje2 = '';
 
-    this.error3 = '';
-    this.bandera.leerEntrada = false;
+    if (!isNullOrUndefined(this.codeEditor3d.getValue())) {
+      if (this.codeEditor3d.getValue().length > 0) {
+        this.error3 = '';
+        this.bandera.leerEntrada = false;
 
-    this.errorEjecucion = [];
-    this.consolaEditor.setValue('');
-    this.consolaEditor.gotoLine(1, 0, false);
-    //verificar que no esté vacío.
-    //let ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
-    this.AST = parserCuadruplos.parse(this.codeEditor3d.getValue());
+        this.errorEjecucion = [];
+        this.consolaEditor.setValue('');
+        this.consolaEditor.gotoLine(1, 0, false);
+        //verificar que no esté vacío.
+        //let ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
+        this.AST = parserCuadruplos.parse(this.codeEditor3d.getValue());
 
-    if (this.AST) {
-      let entorno = new Entorno();
+        if (this.AST) {
+          let entorno = new Entorno();
 
-      this.P = { id: "p", valor: 0, tipo: Tipo.ENTERO };
-      this.H = { id: "h", valor: 0, tipo: Tipo.ENTERO };
-      this.stack = { id: "stack", valor: [], tipo: Tipo.ARREGLO };
-      this.heap = { id: "heap", valor: [], tipo: Tipo.ARREGLO };
+          this.P = { id: "p", valor: 0, tipo: Tipo.ENTERO };
+          this.H = { id: "h", valor: 0, tipo: Tipo.ENTERO };
+          this.stack = { id: "stack", valor: [], tipo: Tipo.ARREGLO };
+          this.heap = { id: "heap", valor: [], tipo: Tipo.ARREGLO };
 
-      entorno.addSimbolo(this.P);
-      entorno.addSimbolo(this.H);
-      entorno.addSimbolo(this.stack);
-      entorno.addSimbolo(this.heap);
+          entorno.addSimbolo(this.P);
+          entorno.addSimbolo(this.H);
+          entorno.addSimbolo(this.stack);
+          entorno.addSimbolo(this.heap);
 
-      this.AST.Bandera = this.bandera;
+          this.AST.Bandera = this.bandera;
 
-      this.AST.ejecutar(this.consolaEditor, this.errorEjecucion, entorno, this.codeEditor3d);//borre asignacion a 147
-    } else {
-      this.error2 = 'Archivo con errores.';
+          this.AST.ejecutar(this.consolaEditor, this.errorEjecucion, entorno, this.codeEditor3d);//borre asignacion a 147
+        } else {
+          this.error2 = 'Archivo con errores.';
+        }
+      }
     }
-
   }
 
   async onDepurar() {
@@ -280,32 +307,35 @@ export class EditorComponent implements OnInit {
     this.mensaje2 = '';
     this.codeEditor3d.setReadOnly(true);
 
-    this.errorEjecucion = [];
-    this.consolaEditor.setValue('');
-    this.consolaEditor.gotoLine(1, 0, false);
+    if (!isNullOrUndefined(this.codeEditor3d.getValue())) {
+      if (this.codeEditor3d.getValue().length > 0) {
+        this.errorEjecucion = [];
+        this.consolaEditor.setValue('');
+        this.consolaEditor.gotoLine(1, 0, false);
 
-    this.AST = parserCuadruplos.parse(this.codeEditor3d.getValue());
-    //ast.ejecutar(this.consolaEditor, this.errorEditor);
-    if (this.AST) {
-      let entorno = new Entorno();
+        this.AST = parserCuadruplos.parse(this.codeEditor3d.getValue());
+        //ast.ejecutar(this.consolaEditor, this.errorEditor);
+        if (this.AST) {
+          let entorno = new Entorno();
 
-      this.P = { id: "p", valor: 0, tipo: Tipo.ENTERO };
-      this.H = { id: "h", valor: 0, tipo: Tipo.ENTERO };
-      this.stack = { id: "stack", valor: [], tipo: Tipo.ARREGLO };
-      this.heap = { id: "heap", valor: [], tipo: Tipo.ARREGLO };
+          this.P = { id: "p", valor: 0, tipo: Tipo.ENTERO };
+          this.H = { id: "h", valor: 0, tipo: Tipo.ENTERO };
+          this.stack = { id: "stack", valor: [], tipo: Tipo.ARREGLO };
+          this.heap = { id: "heap", valor: [], tipo: Tipo.ARREGLO };
 
-      entorno.addSimbolo(this.P);
-      entorno.addSimbolo(this.H);
-      entorno.addSimbolo(this.stack);
-      entorno.addSimbolo(this.heap);
+          entorno.addSimbolo(this.P);
+          entorno.addSimbolo(this.H);
+          entorno.addSimbolo(this.stack);
+          entorno.addSimbolo(this.heap);
 
-      this.AST.Bandera = this.bandera;
+          this.AST.Bandera = this.bandera;
 
-      this.AST.Tiempo = 400 / this.Tiempo;
-      this.AST.Breakpoints = this.breakpoints;
-      this.AST.debugear(this.consolaEditor, this.errorEjecucion, entorno, this.codeEditor3d);
+          this.AST.Tiempo = 400 / this.Tiempo;
+          this.AST.Breakpoints = this.breakpoints;
+          this.AST.debugear(this.consolaEditor, this.errorEjecucion, entorno, this.codeEditor3d);
+        }
+      }
     }
-
     this.codeEditor3d.setReadOnly(false);
   }
 
@@ -485,7 +515,7 @@ export class EditorComponent implements OnInit {
       if (contenido.length > 0) {
         this.errorEjecucion = [];
 
-        let ast : AST;
+        let ast: AST;
         ast = parserCuadruplos.parse(this.codeEditor3d.getValue());
 
         if (ast) {
@@ -500,8 +530,8 @@ export class EditorComponent implements OnInit {
           entorno.addSimbolo(h);
           entorno.addSimbolo(stack);
           entorno.addSimbolo(heap);
-          entorno.addSimbolo({id: "tmp", valor:0, tipo: Tipo.ENTERO});
-          entorno.addSimbolo({id: "t0", valor:0, tipo: Tipo.ENTERO});
+          entorno.addSimbolo({ id: "tmp", valor: 0, tipo: Tipo.ENTERO });
+          entorno.addSimbolo({ id: "t0", valor: 0, tipo: Tipo.ENTERO });
 
           this.asmEditor.setValue(ast.traducir(entorno, this.errorEjecucion));
           this.asmEditor.navigateFileEnd();
@@ -511,4 +541,14 @@ export class EditorComponent implements OnInit {
 
   }
 
+  onOptimizar() {
+    if (!isNullOrUndefined(this.codeEditor3d.getValue())) {
+      if(this.codeEditor3d.getValue().length > 0){
+      this.optimizado = [];
+      let opt = new Optimizador(this.codeEditor3d.getValue(), this.optimizado);
+      this.codeEditorOptimizado.setValue(opt.Optimizar());
+      this.codeEditorOptimizado.navigateLineEnd();
+      }
+    }
+  }
 }
