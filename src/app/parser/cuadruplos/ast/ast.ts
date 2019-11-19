@@ -446,6 +446,7 @@ export class AST {
         inicio += "Pila ENDS\n"
 
         codigo = ".code\n\n";
+        codigo += ".startup\n";
         codigo += "mov  ax, @data\n";
         codigo += "mov  ds, ax\n\n";
 
